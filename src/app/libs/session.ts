@@ -1,5 +1,5 @@
 import nextAppSession from 'next-app-session'
-
+import withSession from 'next-app-session'
 type NySessionData = {
   grantId?: string
   email?: string

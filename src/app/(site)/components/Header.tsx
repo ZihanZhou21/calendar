@@ -23,8 +23,8 @@ export default async function Header() {
       </div>
       {email && (
         <nav className="flex gap-4 items-center ">
-          <Link href={'/about'}>{email}</Link>
-          <Link href={'/api/logout'}>logout</Link>
+          <Link href={'/dashboard'}>{email}</Link>
+          <a href={'/api/logout'}>logout</a>
         </nav>
       )}
       {!email && (

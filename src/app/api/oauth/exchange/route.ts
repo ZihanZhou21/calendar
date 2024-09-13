@@ -26,6 +26,7 @@ export async function GET(req: NextApiRequest) {
   // process.env.NYLAS_GRANT_ID = grantId
   await session().set('grantId', grantId)
   await session().set('email', email)
-  console.log('sdsd', email)
+  console.log('code', code)
+  console.log('exchanecode', response)
   redirect('/')
 }
