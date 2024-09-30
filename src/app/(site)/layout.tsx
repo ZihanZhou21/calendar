@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={noto.className}>
-        <main className="container">
+        <main className="container ">
           <Header />
           {children}
         </main>

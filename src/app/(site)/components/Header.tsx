@@ -7,7 +7,7 @@ export default async function Header() {
   const email = await session().get('email')
 
   return (
-    <header className="flex gap-4 justify-between py-4 text-gray-600 font-light">
+    <header className="bg-green-200 flex gap-4 justify-between py-4 text-gray-600 font-light">
       <div className="flex items-center gap-10">
         <Link
           className="text-blue-600 font-bold text-2xl gap-2 items-center flex"

@@ -8,7 +8,7 @@ export default function DashboardNav() {
   const isEventTypesPage = pathname.includes('event-types')
 
   return (
-    <div className="flex gap-4 justify-center">
+    <div className="flex gap-4 justify-center bg-blue-200">
       <Link
         className={clsx(
           'rounded-full  px-4 py-2 ',
