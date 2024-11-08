@@ -1,15 +1,22 @@
-// components/EventForm.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react'
 import { IEvent } from '../../models/Event'
 import Link from 'next/link'
 import clsx from 'clsx'
+import { useForm } from 'react-hook-form'
 
 interface EventFormProps {
   onClose: () => void
-  onSave: (event: Omit<IEvent, '_id' | 'createdAt'>) => void
+  onSave: (event: Omit<IEvent, '_id' | 'createdAt' | 'updatedAt'>) => void
   initialData?: IEvent | null
+}
+
+interface FormData {
+  title: string
+  description?: string
+  start: string
+  end: string
 }
 
 const EventTypeForm: React.FC<EventFormProps> = ({
@@ -21,28 +28,55 @@ const EventTypeForm: React.FC<EventFormProps> = ({
   const [description, setDescription] = useState<string>('')
   const [start, setStart] = useState<string>('')
   const [end, setEnd] = useState<string>('')
+  const {
+    register,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>()
 
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title)
       setDescription(initialData.description || '')
-      setStart(initialData.start.toISOString().substring(0, 16)) // 格式化为 "YYYY-MM-DDTHH:mm"
-      setEnd(initialData.end.toISOString().substring(0, 16))
+
+      const startDate = new Date(initialData.start)
+      const endDate = new Date(initialData.end)
+
+      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        setStart(startDate.toISOString().substring(0, 16))
+        setEnd(endDate.toISOString().substring(0, 16))
+      } else {
+        console.error('无效的日期格式')
+        setStart('')
+        setEnd('')
+      }
+    } else {
+      reset({
+        title: '',
+        description: '',
+        start: '',
+        end: '',
+      })
+      setTitle('')
+      setDescription('')
+      setStart('')
+      setEnd('')
     }
-    console.log(initialData)
-  }, [initialData])
+  }, [initialData, reset])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const event = {
+
+    const event: Omit<IEvent, '_id' | 'createdAt' | 'updatedAt'> = {
       title,
       description,
       start: new Date(start),
       end: new Date(end),
     }
-    onSave(initialData ? { ...event } : event)
+
+    onSave(event)
     onClose()
-    console.log(event)
+    console.log('Event:', event)
   }
 
   return (
@@ -92,17 +126,9 @@ const EventTypeForm: React.FC<EventFormProps> = ({
           <div className="flex justify-end">
             <button
               type="button"
-              // onClick={onClose}
+              onClick={onClose}
               className="mr-2 px-4 py-2 border rounded">
-              <Link
-                className={clsx(
-                  'rounded-full  px-4 py-2 '
-                  // isEventTypesPage && 'bg-gray-200',
-                  // !isEventTypesPage && 'bg-blue-600'
-                )}
-                href={'/dashboard'}>
-                取消
-              </Link>
+              取消
             </button>
             <button
               type="submit"

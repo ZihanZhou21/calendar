@@ -19,11 +19,29 @@ const CalendarComponent: React.FC<CalendarProps> = ({
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
 
-  const filteredEvents = events.filter(
-    (event) =>
-      new Date(event.start).toDateString() === selectedDate.toDateString()
-  )
+  const filteredEvents = events.filter((event) => {
+    const eventStart = new Date(event.start)
+    const eventEnd = new Date(event.end)
 
+    // 将 selectedDate 的时间部分设置为 00:00:00
+    const startOfSelectedDate = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate()
+    )
+
+    // 将 selectedDate 的时间部分设置为 23:59:59
+    const endOfSelectedDate = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+      23,
+      59,
+      59
+    )
+
+    return eventStart <= endOfSelectedDate && eventEnd >= startOfSelectedDate
+  })
   return (
     <div className="flex flex-col md:flex-row">
       <div className="w-full md:w-1/3">

@@ -1,0 +1,6 @@
+{
+  "terminal.integrated.fontFamily": "MesloLGS NF",
+  "editor.minimap.sectionHeaderLetterSpacing": 1,
+  "editor.letterSpacing": -0.3,
+  "terminal.integrated.letterSpacing": 1
+}

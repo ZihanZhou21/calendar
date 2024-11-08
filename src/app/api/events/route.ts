@@ -7,6 +7,7 @@ export async function GET(req: NextRequest) {
   await dbConnect()
   try {
     const events: IEvent[] = await Event.find({})
+    console.log('Events fetched from database:', events)
     return NextResponse.json({ success: true, data: events }, { status: 200 })
   } catch (error: any) {
     return NextResponse.json(

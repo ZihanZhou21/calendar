@@ -16,11 +16,12 @@
 import mongoose, { Document, Model, Schema } from 'mongoose'
 
 export interface IEvent extends Document {
+  _id: string
   title: string
   description?: string
-  start: Date
-  end: Date
-  createdAt: Date
+  start: string // ISO 格式字符串
+  end: string // ISO 格式字符串
+  createdAt: string
 }
 
 const EventSchema: Schema = new Schema({
