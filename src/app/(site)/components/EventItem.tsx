@@ -12,7 +12,7 @@ interface EventItemProps {
 
 const EventItem: React.FC<EventItemProps> = ({ event, onEdit, onDelete }) => {
   return (
-    <li className="flex justify-between items-center p-2 border-b">
+    <li className="flex bg-blue-200 rounded-xl m-2 justify-between gap-3 items-center p-2 ">
       <div>
         <h3 className="font-semibold">{event.title}</h3>
         <p className="text-sm text-gray-600">{event.description}</p>
@@ -21,15 +21,15 @@ const EventItem: React.FC<EventItemProps> = ({ event, onEdit, onDelete }) => {
           {new Date(event.end).toLocaleString()}
         </p>
       </div>
-      <div>
+      <div className="flex flex-col gap-2 ">
         <button
           onClick={() => onEdit(event)}
-          className="text-blue-500 mr-2 hover:underline">
+          className="whitespace-nowrap text-blue-500 hover:underline">
           编辑
         </button>
         <button
           onClick={() => onDelete(event._id)}
-          className="text-red-500 hover:underline">
+          className="whitespace-nowrap text-red-500 hover:underline">
           删除
         </button>
       </div>

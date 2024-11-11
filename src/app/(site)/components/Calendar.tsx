@@ -66,8 +66,8 @@ const CalendarComponent: React.FC<CalendarProps> = ({
   }
 
   return (
-    <div className="flex flex-col md:flex-row">
-      <div className="w-full md:w-1/3">
+    <div className="flex flex-col md:flex-row bg-slate-500">
+      <div className=" flex">
         <ReactCalendar
           onChange={setSelectedDate}
           value={selectedDate}
@@ -75,12 +75,12 @@ const CalendarComponent: React.FC<CalendarProps> = ({
           className="react-calendar"
         />
       </div>
-      <div className="w-full md:w-2/3 md:ml-4 mt-4 md:mt-0 sm:ml-4">
-        <h2 className="text-xl font-semibold mb-2">选定日期的日程</h2>
+      <div className="flex flex-col mx-4 mb-4">
+        <h2 className="text-xl font-semibold my-2 ml-2">选定日期的日程</h2>
         {filteredEvents.length === 0 ? (
           <p>该日期没有日程安排。</p>
         ) : (
-          <ul>
+          <ul className="rounded-2xl bg-white overflow-hidden">
             {filteredEvents.map((event) => (
               <EventItem
                 key={event._id}

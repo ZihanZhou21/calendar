@@ -132,7 +132,7 @@ const EventTypeForm: React.FC<EventFormProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="mr-2 px-4 py-2 border rounded">
+              className=" px-4 py-2 border rounded">
               取消
             </button>
             <button
