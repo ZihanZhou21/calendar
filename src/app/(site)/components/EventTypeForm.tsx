@@ -67,6 +67,11 @@ const EventTypeForm: React.FC<EventFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    if (new Date(end) < new Date(start)) {
+      alert('结束时间不能早于起始时间')
+      return
+    }
+
     const event: Omit<IEvent, '_id' | 'createdAt' | 'updatedAt'> = {
       title,
       description,

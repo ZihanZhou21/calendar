@@ -12,7 +12,7 @@ export default function DashboardPage() {
   const { data, error, isLoading } = useSWR('/api/events')
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error loading events</div>
-  console.log('Fetched Events:', data)
+  // console.log('Fetched Events:', data)
 
   return (
     <div className="bg-red-200">
@@ -31,8 +31,8 @@ export default function DashboardPage() {
           <EventItem
             key={event._id}
             event={event}
-            onEdit={onEdit}
-            onDelete={onDelete}
+            // onEdit={onEdit}
+            // onDelete={onDelete}
           />
         ))}
       </ul>

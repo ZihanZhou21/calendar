@@ -27,6 +27,6 @@ export async function GET(req: NextApiRequest) {
   await session().set('grantId', grantId)
   await session().set('email', email)
   console.log('code', code)
-  console.log('exchanecode', response)
+  // console.log('exchanecode', response)
   redirect('/')
 }
