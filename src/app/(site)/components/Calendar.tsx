@@ -3,6 +3,7 @@ import ReactCalendar, { TileContentFunc } from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
 import EventItem from './EventItem'
 import { IEvent } from '../../models/Event'
+import { isSameDay, startOfDay, endOfDay, parseISO } from 'date-fns'
 
 interface CalendarProps {
   events: IEvent[]
@@ -18,25 +19,11 @@ const CalendarComponent: React.FC<CalendarProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
 
   const filteredEvents = events.filter((event) => {
-    const eventStart = new Date(event.start)
-    const eventEnd = new Date(event.end)
+    const eventStart = parseISO(event.start)
+    const eventEnd = parseISO(event.end)
 
-    // 将 selectedDate 的时间部分设置为 00:00:00
-    const startOfSelectedDate = new Date(
-      selectedDate.getFullYear(),
-      selectedDate.getMonth(),
-      selectedDate.getDate()
-    )
-
-    // 将 selectedDate 的时间部分设置为 23:59:59
-    const endOfSelectedDate = new Date(
-      selectedDate.getFullYear(),
-      selectedDate.getMonth(),
-      selectedDate.getDate(),
-      23,
-      59,
-      59
-    )
+    const startOfSelectedDate = startOfDay(selectedDate)
+    const endOfSelectedDate = endOfDay(selectedDate)
 
     return eventStart <= endOfSelectedDate && eventEnd >= startOfSelectedDate
   })
@@ -49,10 +36,10 @@ const CalendarComponent: React.FC<CalendarProps> = ({
       view === 'year'
     ) {
       const hasEvent = events.some((event) => {
-        const eventStart = new Date(event.start)
-        const eventEnd = new Date(event.end)
+        const eventStart = parseISO(event.start)
+        const eventEnd = parseISO(event.end)
         return (
-          eventStart.toDateString() === date.toDateString() ||
+          isSameDay(eventStart, date) ||
           (eventStart <= date && eventEnd >= date)
         )
       })
