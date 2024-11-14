@@ -103,7 +103,7 @@ export default function DashboardPage() {
         </Button>
       </div>
       <ul>
-        {data.data.map((event) => (
+        {data.data.map((event: IEvent) => (
           <EventItem
             key={event._id}
             event={event}
