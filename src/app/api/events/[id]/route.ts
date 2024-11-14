@@ -3,10 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '../../../utils/dbConnect'
 import Event, { IEvent } from '../../../models/Event'
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await dbConnect()
   try {
     const event: IEvent | null = await Event.findById(params.id)
@@ -25,10 +23,8 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await dbConnect()
   try {
     const body = await req.json()
@@ -55,10 +51,8 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await dbConnect()
   try {
     const deletedEvent = await Event.deleteOne({ _id: params.id })
