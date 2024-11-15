@@ -1,24 +1,31 @@
 'use client'
+import React, { useState } from 'react'
 import { Button, Drawer } from 'flowbite-react'
-import Link from 'next/link'
-import React from 'react'
-import DashboardNav from '../components/DashboardNav'
-import CalendarComponent from '../components/Calendar'
 import { IEvent } from '@/app/models/Event'
 import useSWR, { mutate } from 'swr'
+import DashboardNav from '../components/DashboardNav'
+import CalendarComponent from '../components/Calendar'
 import EventItem from '../components/EventItem'
-import { useState } from 'react'
 import EventTypeForm from '../components/EventTypeForm'
+
+interface EventFormData {
+  title: string
+  description?: string
+  start: string
+  end: string
+}
 
 export default function DashboardPage() {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<IEvent | null>(null)
+  const [formKey, setFormKey] = useState(0) // 用于强制重新渲染表单组件
+
   const { data, error, isLoading } = useSWR('/api/events')
+
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error loading events</div>
-  // console.log('Fetched Events:', data)
 
-  const addEvent = async (event: Omit<IEvent, '_id' | 'createdAt'>) => {
+  const addEvent = async (event: EventFormData) => {
     try {
       const res = await fetch('/api/events', {
         method: 'POST',
@@ -37,7 +44,7 @@ export default function DashboardPage() {
     }
   }
 
-  const updateEvent = async (id: string, updatedEvent: Partial<IEvent>) => {
+  const updateEvent = async (id: string, updatedEvent: EventFormData) => {
     try {
       const res = await fetch(`/api/events/${id}`, {
         method: 'PUT',
@@ -75,11 +82,13 @@ export default function DashboardPage() {
 
   const handleEdit = (event: IEvent) => {
     setSelectedEvent(event)
+    setFormKey((prevKey) => prevKey + 1) // 更新 key 值来重新渲染表单
     setIsOpen(true)
   }
 
   const handleAdd = () => {
     setSelectedEvent(null)
+    setFormKey((prevKey) => prevKey + 1) // 更新 key 值来重新渲染表单
     setIsOpen(true)
   }
 
@@ -87,36 +96,42 @@ export default function DashboardPage() {
     setIsOpen(false)
     setSelectedEvent(null)
   }
+
   return (
     <div className="bg-red-200">
       <DashboardNav />
-      <CalendarComponent
-        events={data.data}
-        onEdit={handleEdit}
-        onDelete={deleteEvent}
-      />
-      <div className="flex justify-center my-4">
-        <Button
-          onClick={handleAdd}
-          className="bg-blue-500 text-white px-4 py-2 rounded">
-          添加日程
-        </Button>
-      </div>
-      <ul>
-        {data.data.map((event: IEvent) => (
-          <EventItem
-            key={event._id}
-            event={event}
+      {data && data.data && (
+        <>
+          <CalendarComponent
+            events={data.data}
             onEdit={handleEdit}
             onDelete={deleteEvent}
           />
-        ))}
-      </ul>
-      <div>booked events listed here</div>
+          <div className="flex justify-center my-4">
+            <Button
+              onClick={handleAdd}
+              className="bg-blue-500 text-white px-4 py-2 rounded">
+              添加日程
+            </Button>
+          </div>
+          <ul>
+            {data.data.map((event: IEvent) => (
+              <EventItem
+                key={event._id}
+                event={event}
+                onEdit={handleEdit}
+                onDelete={deleteEvent}
+              />
+            ))}
+          </ul>
+          <div>booked events listed here</div>
+        </>
+      )}
       <Drawer open={isOpen} onClose={handleClose} position="right">
         <Drawer.Header>{selectedEvent ? '编辑日程' : '添加日程'}</Drawer.Header>
         <div className="p-4">
           <EventTypeForm
+            key={formKey} // 每次重新渲染时更新 key
             onClose={handleClose}
             onSave={
               selectedEvent

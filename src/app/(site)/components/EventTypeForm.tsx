@@ -5,14 +5,22 @@ import { IEvent } from '../../models/Event'
 import Link from 'next/link'
 import clsx from 'clsx'
 import { useForm } from 'react-hook-form'
+import { format, parseISO } from 'date-fns'
 
 interface EventFormProps {
   onClose: () => void
-  onSave: (event: Omit<IEvent, '_id' | 'createdAt' | 'updatedAt'>) => void
+  onSave: (event: EventFormData) => void // 使用新的类型
   initialData?: IEvent | null
 }
 
 interface FormData {
+  title: string
+  description?: string
+  start: Date | string
+  end: Date | string
+}
+
+interface EventFormData {
   title: string
   description?: string
   start: string
@@ -39,12 +47,12 @@ const EventTypeForm: React.FC<EventFormProps> = ({
       setTitle(initialData.title)
       setDescription(initialData.description || '')
 
-      const startDate = new Date(initialData.start)
-      const endDate = new Date(initialData.end)
+      const startDate = parseISO(initialData.start as string)
+      const endDate = parseISO(initialData.end as string)
 
       if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
-        setStart(startDate.toISOString().substring(0, 16))
-        setEnd(endDate.toISOString().substring(0, 16))
+        setStart(format(startDate, "yyyy-MM-dd'T'HH:mm"))
+        setEnd(format(endDate, "yyyy-MM-dd'T'HH:mm"))
       } else {
         console.error('无效的日期格式')
         setStart('')
@@ -72,11 +80,12 @@ const EventTypeForm: React.FC<EventFormProps> = ({
       return
     }
 
-    const event: Omit<IEvent, '_id' | 'createdAt' | 'updatedAt'> = {
+    // 使用简化后的类型创建事件对象
+    const event: EventFormData = {
       title,
       description,
-      start: new Date(start),
-      end: new Date(end),
+      start: new Date(start).toISOString(),
+      end: new Date(end).toISOString(),
     }
 
     onSave(event)

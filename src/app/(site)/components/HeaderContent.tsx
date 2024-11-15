@@ -5,7 +5,11 @@ import Link from 'next/link'
 import { CalendarDays } from 'lucide-react'
 import { Dropdown } from 'flowbite-react'
 
-export default function HeaderContent({ email }) {
+interface HeaderContentProps {
+  email?: string | null
+}
+
+export default function HeaderContent({ email }: HeaderContentProps) {
   const menuItems = [
     { path: '/features', label: 'Features' },
     { path: '/about', label: 'About' },
