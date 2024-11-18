@@ -9,12 +9,14 @@ interface CalendarComponentProps {
   events: IEvent[]
   onEdit: (event: IEvent) => void
   onDelete: (id: string) => void
+  onAdd: () => void
 }
 
 const CalendarComponent: React.FC<CalendarComponentProps> = ({
   events,
   onEdit,
   onDelete,
+  onAdd,
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
 
@@ -77,7 +79,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
           <h2 className="text-xl font-semibold my-2 ml-2">
             Selected Date&apos;s Events
           </h2>
-          <button className="mr-[5%]">
+          <button className="mr-[5%] " onClick={onAdd}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

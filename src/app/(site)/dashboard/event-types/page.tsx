@@ -93,14 +93,15 @@ export default function EventTypesPage() {
         events={data.data}
         onEdit={handleEdit}
         onDelete={deleteEvent}
+        onAdd={handleAdd}
       />
-      <div className="flex justify-center my-4">
+      {/* <div className="flex justify-center my-4">
         <Button
           onClick={handleAdd}
           className="bg-blue-500 text-white px-4 py-2 rounded">
           添加日程
         </Button>
-      </div>
+      </div> */}
       <Drawer open={isOpen} onClose={handleClose} position="right">
         <Drawer.Header>{selectedEvent ? '编辑日程' : '添加日程'}</Drawer.Header>
         <div className="p-4">
