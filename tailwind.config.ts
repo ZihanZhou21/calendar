@@ -16,9 +16,17 @@ const config: Config = {
     fontSize,
     container: {
       center: true,
-      padding: '2rem',
+      padding: {
+        DEFAULT: '1rem',
+        sm: '2rem',
+        lg: '4rem',
+      },
       screens: {
-        xs: '700px',
+        sm: '100%',
+        md: '728px',
+        lg: '1024px',
+        xl: '1280px',
+        '2xl': '1536px',
       },
     },
     extend: {
