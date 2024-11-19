@@ -95,7 +95,7 @@ const EventTypeForm: React.FC<EventFormProps> = ({
 
   return (
     <div className="flex items-center justify-center py-4">
-      <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+      <div className=" p-6  w-full max-w-md">
         <h2 className="text-2xl mb-4">
           {initialData ? '编辑日程' : '添加日程'}
         </h2>
