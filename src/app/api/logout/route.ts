@@ -1,7 +1,14 @@
-import { session } from '@/app/libs/session'
+// import { session } from '@/app/libs/session'
 import { redirect } from 'next/navigation'
-
+import { sessionOptions } from '@/app/libs/session'
+import { getIronSession } from 'iron-session'
+import { SessionData } from 'next-app-session/dist/types'
+import { cookies } from 'next/headers'
 export async function GET() {
-  await session().destroy()
+  const session = await getIronSession<SessionData>(
+    await cookies(),
+    sessionOptions
+  )
+  session.destroy()
   redirect('/?logged-out=1')
 }
