@@ -10,5 +10,5 @@ export async function GET() {
     sessionOptions
   )
   session.destroy()
-  redirect('/?logged-out=1')
+  return redirect('/?logged-out=1')
 }
