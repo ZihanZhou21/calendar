@@ -36,7 +36,7 @@ export default function HeaderContent({ email }: HeaderContentProps) {
         {email ? (
           <>
             <Link href="/dashboard">{email}</Link>
-            <Link href="/api/logout">Logout</Link>
+            <a href="/api/logout">Logout</a>
           </>
         ) : (
           <>
