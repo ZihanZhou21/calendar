@@ -115,7 +115,7 @@ export default function DashboardPage() {
               添加日程
             </Button>
           </div> */}
-          <ul>
+          {/* <ul>
             {data.data.map((event: IEvent) => (
               <EventItem
                 key={event._id}
@@ -123,6 +123,21 @@ export default function DashboardPage() {
                 onEdit={handleEdit}
                 onDelete={deleteEvent}
               />
+            ))}
+          </ul> */}
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            {data.data.map((event: IEvent) => (
+              <div
+                key={event._id}
+                className="bg-blue-100 rounded-lg shadow-md p-4 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                <div className="bg-lime-200 h-full">
+                  <EventItem
+                    event={event}
+                    onEdit={handleEdit}
+                    onDelete={deleteEvent}
+                  />
+                </div>
+              </div>
             ))}
           </ul>
           <div>booked events listed here</div>

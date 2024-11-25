@@ -30,6 +30,10 @@ const config: Config = {
       },
     },
     extend: {
+      screens: {
+        custom: '696px',
+        // ...additional custom breakpoints
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':

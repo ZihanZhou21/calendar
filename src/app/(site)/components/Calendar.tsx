@@ -66,7 +66,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
 
   return (
     <div className="flex flex-col md:flex-row bg-slate-500">
-      <div className="flex">
+      <div className="flex ">
         <ReactCalendar
           onChange={handleDateChange}
           value={selectedDate}
@@ -74,7 +74,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
           className="react-calendar"
         />
       </div>
-      <div className="flex flex-col mx-4 mb-4 bg-slate-300">
+      <div className="flex w-400 flex-col mx-4 mb-4 bg-slate-300">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold my-2 ml-2">
             Selected Date&apos;s Events

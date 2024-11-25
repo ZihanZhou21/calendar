@@ -12,10 +12,12 @@ interface EventItemProps {
 
 const EventItem: React.FC<EventItemProps> = ({ event, onEdit, onDelete }) => {
   return (
-    <li className="flex bg-blue-200 rounded-xl m-2 justify-between gap-3 items-center p-2 ">
-      <div>
+    <div className="flex  rounded-xl justify-between gap-3 items-center p-2 ">
+      <div className="overflow-hidden">
         <h3 className="font-semibold">{event.title}</h3>
-        <p className="text-sm text-gray-600">{event.description}</p>
+        <p className="text-sm break-all break-words text-gray-600">
+          {event.description}
+        </p>
         <p className="text-sm">
           {new Date(event.start).toLocaleString()} -{' '}
           {new Date(event.end).toLocaleString()}
@@ -33,7 +35,7 @@ const EventItem: React.FC<EventItemProps> = ({ event, onEdit, onDelete }) => {
           删除
         </button>
       </div>
-    </li>
+    </div>
   )
 }
 

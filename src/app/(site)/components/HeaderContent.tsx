@@ -27,7 +27,7 @@ export default function HeaderContent({ email }: HeaderContentProps) {
       </Link>
 
       {/* Navigation links for larger screens */}
-      <nav className="hidden sm:flex gap-4 items-center">
+      <nav className="hidden custom:flex gap-4 items-center">
         {menuItems.map((item, index) => (
           <Link key={index} href={item.path}>
             {item.label}
@@ -49,10 +49,10 @@ export default function HeaderContent({ email }: HeaderContentProps) {
           </>
         )}
       </nav>
-
-      <div className="sm:hidden">
+      {/* Dropdown for smaller screens */}
+      <div className="custom:hidden">
         <Dropdown
-          label={email || 'sign in'}
+          label={email || 'Sign in'}
           inline
           dismissOnClick
           className="ml-auto">
