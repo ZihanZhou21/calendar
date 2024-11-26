@@ -22,7 +22,7 @@ const config: Config = {
         lg: '4rem',
       },
       screens: {
-        sm: '100%',
+        sm: '640px',
         md: '728px',
         lg: '1024px',
         xl: '1280px',
