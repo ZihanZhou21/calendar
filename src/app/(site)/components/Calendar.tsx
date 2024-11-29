@@ -80,12 +80,44 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
     ? moment(selectedDate).format('YYYY年MM月DD日')
     : '未选择日期'
 
+  // 添加日期样式处理函数
+  const dayPropGetter = (date: Date) => {
+    // 将日期重置为 00:00:00 以便比较
+    const normalizedDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    )
+    const normalizedSelectedDate =
+      selectedDate &&
+      new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate()
+      )
+
+    // 检查是否是选中的日期
+    if (
+      normalizedSelectedDate &&
+      normalizedDate.getTime() === normalizedSelectedDate.getTime()
+    ) {
+      return {
+        className: 'selected-day',
+        style: {
+          backgroundColor: '#e3f2fd', // 浅蓝色背景
+          borderRadius: '4px',
+        },
+      }
+    }
+    return {}
+  }
+
   return (
     <div className="flex flex-col md:flex-row bg-gray-100">
       <div className="flex flex-grow bg-white rounded-lg p-4">
         <Calendar
           localizer={localizer}
-          events={formattedEvents}
+          events={formattedEvents as any[]}
           startAccessor="start"
           endAccessor="end"
           view={currentView}
@@ -96,6 +128,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
           selectable
           onSelectEvent={handleSelectEvent}
           onSelectSlot={handleSelectSlot}
+          dayPropGetter={dayPropGetter}
           style={{
             height: '80vh',
             width: '100%',
@@ -151,5 +184,21 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
     </div>
   )
 }
+
+// 添加自定义样式
+const styles = `
+.selected-day {
+  transition: background-color 0.3s ease;
+}
+
+.selected-day:hover {
+  background-color: #bbdefb !important;
+}
+`
+
+// 将样式添加到组件中
+const styleSheet = document.createElement('style')
+styleSheet.innerText = styles
+document.head.appendChild(styleSheet)
 
 export default CalendarComponent

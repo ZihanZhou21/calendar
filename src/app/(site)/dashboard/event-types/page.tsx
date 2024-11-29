@@ -61,21 +61,17 @@ export default function EventTypesPage() {
   }
 
   const deleteEvent = async (id: string) => {
-    try {
-      const res = await fetch(`/api/events/${id}`, {
-        method: 'DELETE',
-      })
-      const result = await res.json()
-      if (result.success) {
+    if (window.confirm('确定要删除这个日程吗？')) {
+      try {
+        await fetch(`/api/events/${id}`, {
+          method: 'DELETE',
+        })
         mutate('/api/events')
-      } else {
-        console.error(result.error)
+      } catch (error) {
+        console.error('删除失败:', error)
       }
-    } catch (err) {
-      console.error(err)
     }
   }
-
   const handleEdit = (event: IEvent) => {
     setSelectedEvent(event)
     setFormKey((prevKey) => prevKey + 1) // 更新 key 值来重新渲染表单
