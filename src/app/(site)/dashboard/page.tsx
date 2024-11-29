@@ -1,12 +1,17 @@
 'use client'
+
 import React, { useState } from 'react'
-import { Button, Drawer } from 'flowbite-react'
-import { IEvent } from '@/app/models/Event'
+import { Calendar, momentLocalizer, Views } from 'react-big-calendar'
+import moment from 'moment'
 import useSWR, { mutate } from 'swr'
+import 'react-big-calendar/lib/css/react-big-calendar.css'
 import DashboardNav from '../components/DashboardNav'
-import CalendarComponent from '../components/Calendar'
 import EventItem from '../components/EventItem'
 import EventTypeForm from '../components/EventTypeForm'
+import { Drawer, Button } from 'flowbite-react'
+import { IEvent } from '@/app/models/Event'
+
+const localizer = momentLocalizer(moment)
 
 interface EventFormData {
   title: string
@@ -16,14 +21,19 @@ interface EventFormData {
 }
 
 export default function DashboardPage() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [selectedEvent, setSelectedEvent] = useState<IEvent | null>(null)
-  const [formKey, setFormKey] = useState(0) // 用于强制重新渲染表单组件
+  const [currentView, setCurrentView] = useState(Views.MONTH) // Controlled view
+  const [currentDate, setCurrentDate] = useState(new Date()) // Controlled date
+  const [isOpen, setIsOpen] = useState(false) // Drawer visibility
+  const [selectedEvent, setSelectedEvent] = useState<IEvent | null>(null) // Selected event for editing
+  const [formKey, setFormKey] = useState(0) // Unique key for form re-rendering
 
   const { data, error, isLoading } = useSWR('/api/events')
 
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error loading events</div>
+  const allViews = [Views.DAY, Views.WEEK, Views.MONTH, Views.AGENDA]
+
+  const handleViewChange = (view: any) => setCurrentView(view)
+  const handleNavigate = (date: React.SetStateAction<Date>) =>
+    setCurrentDate(date)
 
   const addEvent = async (event: EventFormData) => {
     try {
@@ -82,13 +92,13 @@ export default function DashboardPage() {
 
   const handleEdit = (event: IEvent) => {
     setSelectedEvent(event)
-    setFormKey((prevKey) => prevKey + 1) // 更新 key 值来重新渲染表单
+    setFormKey((prev) => prev + 1)
     setIsOpen(true)
   }
 
   const handleAdd = () => {
     setSelectedEvent(null)
-    setFormKey((prevKey) => prevKey + 1) // 更新 key 值来重新渲染表单
+    setFormKey((prev) => prev + 1)
     setIsOpen(true)
   }
 
@@ -96,58 +106,70 @@ export default function DashboardPage() {
     setIsOpen(false)
     setSelectedEvent(null)
   }
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Error loading events</div>
+  const handleSelectSlot = (slotInfo: {
+    start: Date
+    end: Date
+    slots: Date[]
+  }) => {
+    setSelectedDate(slotInfo.start)
+  }
 
   return (
-    <div className="bg-red-200">
+    <div className="bg-gray-100 min-h-screen">
       <DashboardNav />
-      {data && data.data && (
-        <>
-          <CalendarComponent
-            events={data.data}
-            onEdit={handleEdit}
-            onDelete={deleteEvent}
-            onAdd={handleAdd}
-          />
-          {/* <div className="flex justify-center my-4">
-            <Button
-              onClick={handleAdd}
-              className="bg-blue-500 text-white px-4 py-2 rounded">
-              添加日程
-            </Button>
-          </div> */}
-          {/* <ul>
-            {data.data.map((event: IEvent) => (
+      <div className="container mx-auto py-6">
+        <Button onClick={handleAdd} className="mb-4">
+          Add New Event
+        </Button>
+        <Calendar
+          localizer={localizer}
+          events={
+            data?.data.map((event: IEvent) => ({
+              ...event,
+              start: new Date(event.start),
+              end: new Date(event.end),
+            })) || []
+          }
+          // events={ data.data}
+          view={currentView}
+          onView={handleViewChange}
+          date={currentDate}
+          onNavigate={handleNavigate}
+          views={allViews}
+          selectable
+          onSelectEvent={handleEdit}
+          onSelectSlot={handleSelectSlot}
+          style={{
+            height: '80vh',
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '16px',
+          }}
+        />
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          {data?.data.map((event: IEvent) => (
+            <div
+              key={event._id}
+              className="bg-white rounded-lg shadow-md p-4 border border-gray-200 hover:shadow-lg transition-shadow duration-300">
               <EventItem
-                key={event._id}
                 event={event}
                 onEdit={handleEdit}
-                onDelete={deleteEvent}
+                onDelete={() => deleteEvent(event._id)}
               />
-            ))}
-          </ul> */}
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-            {data.data.map((event: IEvent) => (
-              <div
-                key={event._id}
-                className="bg-blue-100 rounded-lg shadow-md p-4 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
-                <div className="bg-lime-200 h-full">
-                  <EventItem
-                    event={event}
-                    onEdit={handleEdit}
-                    onDelete={deleteEvent}
-                  />
-                </div>
-              </div>
-            ))}
-          </ul>
-          <div>booked events listed here</div>
-        </>
-      )}
+            </div>
+          ))}
+        </ul>
+      </div>
       <Drawer open={isOpen} onClose={handleClose} position="right">
-        <Drawer.Header>{selectedEvent ? '编辑日程' : '添加日程'}</Drawer.Header>
+        <Drawer.Header>
+          {selectedEvent ? 'Edit Event' : 'Add Event'}
+        </Drawer.Header>
         <div className="p-4">
           <EventTypeForm
-            key={formKey} // 每次重新渲染时更新 key
+            key={formKey}
             onClose={handleClose}
             onSave={
               selectedEvent

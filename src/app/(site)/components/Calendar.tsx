@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import ReactCalendar, { CalendarProps } from 'react-calendar'
-import 'react-calendar/dist/Calendar.css'
+import { Calendar, momentLocalizer, Views } from 'react-big-calendar'
+import moment from 'moment'
+import 'react-big-calendar/lib/css/react-big-calendar.css'
 import EventItem from './EventItem'
 import { IEvent } from '../../models/Event'
-import { isSameDay, startOfDay, endOfDay, parseISO } from 'date-fns'
 
 interface CalendarComponentProps {
   events: IEvent[]
@@ -12,66 +12,66 @@ interface CalendarComponentProps {
   onAdd: () => void
 }
 
+const localizer = momentLocalizer(moment)
+
 const CalendarComponent: React.FC<CalendarComponentProps> = ({
   events,
   onEdit,
   onDelete,
   onAdd,
 }) => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-
-  const handleDateChange: CalendarProps['onChange'] = (value, event) => {
-    if (value instanceof Date) {
-      setSelectedDate(value)
-    } else if (
-      Array.isArray(value) &&
-      value.length > 0 &&
-      value[0] instanceof Date
-    ) {
-      setSelectedDate(value[0])
-    }
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [currentView, setCurrentView] = useState(Views.MONTH)
+  const [currentDate, setCurrentDate] = useState(new Date()) // Controlled date
+  const handleViewChange = (view: any) => setCurrentView(view)
+  const handleSelectEvent = (event: IEvent) => {
+    onEdit(event)
+    console.log(event)
   }
 
-  const filteredEvents = events.filter((event) => {
-    const eventStart = parseISO(event.start)
-    const eventEnd = parseISO(event.end)
-    const startOfSelectedDate = startOfDay(selectedDate)
-    const endOfSelectedDate = endOfDay(selectedDate)
-    return eventStart <= endOfSelectedDate && eventEnd >= startOfSelectedDate
-  })
-
-  const tileContent: CalendarProps['tileContent'] = ({ date, view }) => {
-    if (
-      view === 'month' ||
-      view === 'year' ||
-      view === 'decade' ||
-      view === 'century'
-    ) {
-      const hasEvent = events.some((event) => {
-        const eventStart = parseISO(event.start)
-        const eventEnd = parseISO(event.end)
-        return (
-          isSameDay(eventStart, date) ||
-          (eventStart <= date && eventEnd >= date)
-        )
-      })
-      return hasEvent ? (
-        <div className="flex items-center justify-center w-full h-full">
-          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-        </div>
-      ) : null
-    }
-    return null
+  const handleSelectSlot = (slotInfo: {
+    start: Date
+    end: Date
+    slots: Date[]
+  }) => {
+    setSelectedDate(slotInfo.start)
   }
+
+  const handleNavigate = (date: React.SetStateAction<Date>) =>
+    setCurrentDate(date)
+  const allViews = [Views.DAY, Views.WEEK, Views.MONTH, Views.AGENDA]
+
+  const filteredEvents =
+    selectedDate &&
+    events.filter((event) => {
+      const start = new Date(event.start)
+      const end = new Date(event.end)
+      return start <= selectedDate && end >= selectedDate
+    })
+
+  const formattedEvents = events.map((event) => ({
+    ...event,
+    start: new Date(event.start),
+    end: new Date(event.end),
+  }))
 
   return (
     <div className="flex flex-col md:flex-row bg-slate-500">
-      <div className="flex ">
-        <ReactCalendar
-          onChange={handleDateChange}
-          value={selectedDate}
-          tileContent={tileContent}
-          className="react-calendar"
+      <div className="flex flex-grow">
+        <Calendar
+          localizer={localizer}
+          events={formattedEvents}
+          startAccessor="start"
+          endAccessor="end"
+          view={currentView}
+          views={allViews}
+          onView={handleViewChange}
+          date={currentDate}
+          onNavigate={handleNavigate}
+          selectable
+          onSelectEvent={handleSelectEvent}
+          onSelectSlot={handleSelectSlot}
+          style={{ height: '80vh', width: '100%' }}
         />
       </div>
       <div className="flex w-400 flex-col mx-4 mb-4 bg-slate-300">
@@ -79,7 +79,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
           <h2 className="text-xl font-semibold my-2 ml-2">
             Selected Date&apos;s Events
           </h2>
-          <button className="mr-[5%] " onClick={onAdd}>
+          <button className="mr-[5%]" onClick={onAdd}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -95,18 +95,19 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
             </svg>
           </button>
         </div>
-        {filteredEvents.length === 0 ? (
+        {filteredEvents && filteredEvents.length === 0 ? (
           <p>No events scheduled for this date.</p>
         ) : (
           <ul className="rounded-2xl bg-white overflow-hidden">
-            {filteredEvents.map((event) => (
-              <EventItem
-                key={event._id}
-                event={event}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
-            ))}
+            {filteredEvents &&
+              filteredEvents.map((event) => (
+                <EventItem
+                  key={event._id}
+                  event={event}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                />
+              ))}
           </ul>
         )}
       </div>

@@ -18,9 +18,9 @@ import mongoose, { Document, Model, Schema } from 'mongoose'
 export interface IEvent extends Document {
   _id: string
   title: string
+  start: Date | string
+  end: Date | string
   description?: string
-  start: string // ISO 格式字符串
-  end: string // ISO 格式字符串
   createdAt: string
 }
 
