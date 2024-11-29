@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Calendar, momentLocalizer, Views } from 'react-big-calendar'
+import { Calendar, momentLocalizer, View, Views } from 'react-big-calendar'
 import moment from 'moment'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import EventItem from './EventItem'
@@ -21,10 +21,15 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
   onAdd,
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [currentView, setCurrentView] = useState(Views.MONTH)
+  const [currentView, setCurrentView] = useState<View>(Views.MONTH)
   const [currentDate, setCurrentDate] = useState(moment().toDate())
 
-  const handleViewChange = (view: any) => setCurrentView(view)
+  const handleViewChange = (view: View) => {
+    setCurrentView(view)
+    console.log(currentDate)
+    console.log(getStartDate())
+    console.log(getLength())
+  }
 
   const handleSelectEvent = (event: IEvent) => {
     onEdit(event)
@@ -103,6 +108,35 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
       'text-xs py-0.5 px-1.5 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200',
   })
 
+  // 根据当前视图获取agenda范围配置
+  const [startDate, setStartDate] = useState<Date>(
+    moment(currentDate).startOf('month').toDate()
+  )
+  const [length, setLength] = useState(1)
+  const getStartDate = () => {
+    switch (currentView) {
+      case Views.MONTH:
+        return setStartDate(moment(currentDate).startOf('month').toDate())
+      case Views.WEEK:
+        return setStartDate(moment(currentDate).startOf('week').toDate())
+      case Views.DAY:
+        return currentDate
+      default:
+        return moment(currentDate).startOf('month').toDate()
+    }
+  }
+  const getLength = () => {
+    switch (currentView) {
+      case Views.MONTH:
+        return setLength(moment(currentDate).daysInMonth())
+      case Views.WEEK:
+        return setLength(7)
+      case Views.DAY:
+        return setLength(1)
+      default:
+        return moment(currentDate).daysInMonth()
+    }
+  }
   return (
     <div className="flex flex-col md:flex-row bg-gray-100">
       <div className="flex flex-grow bg-white rounded-lg p-4">
@@ -114,7 +148,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
           view={currentView}
           views={allViews}
           onView={handleViewChange}
-          date={currentDate}
+          // date={currentDate}
           onNavigate={handleNavigate}
           selectable
           onSelectEvent={handleSelectEvent}
@@ -126,6 +160,8 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
             height: '80vh',
             width: '100%',
           }}
+          length={length}
+          date={currentDate}
         />
       </div>
       <div className="flex w-[400px] flex-col mx-4 mb-4">
@@ -176,21 +212,5 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
     </div>
   )
 }
-
-// 添加自定义样式
-// const styles = `
-// .selected-day {
-//   transition: background-color 0.3s ease;
-// }
-
-// .selected-day:hover {
-//   background-color: #bbdefb !important;
-// }
-// `
-
-// // 将样式添加到组件中
-// const styleSheet = document.createElement('style')
-// styleSheet.innerText = styles
-// document.head.appendChild(styleSheet)
 
 export default CalendarComponent
