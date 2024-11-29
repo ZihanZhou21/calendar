@@ -22,11 +22,12 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [currentView, setCurrentView] = useState(Views.MONTH)
-  const [currentDate, setCurrentDate] = useState(new Date()) // Controlled date
+  const [currentDate, setCurrentDate] = useState(moment().toDate())
+
   const handleViewChange = (view: any) => setCurrentView(view)
+
   const handleSelectEvent = (event: IEvent) => {
     onEdit(event)
-    console.log(event)
   }
 
   const handleSelectSlot = (slotInfo: {
@@ -35,82 +36,72 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
     slots: Date[]
     action: 'select' | 'click' | 'doubleClick'
   }) => {
-    // 设置选中的日期
     setSelectedDate(slotInfo.start)
   }
 
   const handleNavigate = (date: React.SetStateAction<Date>) =>
     setCurrentDate(date)
+
   const allViews = [Views.DAY, Views.WEEK, Views.MONTH, Views.AGENDA]
 
-  // 修改 filteredEvents 逻辑，只比较日期而不是具体时间
+  // 使用 moment 处理事件过滤
   const filteredEvents = selectedDate
     ? events.filter((event) => {
-        const eventStart = new Date(event.start)
-        const eventEnd = new Date(event.end)
-        const selected = new Date(selectedDate)
+        const eventStart = moment(event.start)
+        const eventEnd = moment(event.end)
+        const selectedDay = moment(selectedDate)
 
-        // 重置时间为 00:00:00
-        const selectedDateStart = new Date(
-          selected.getFullYear(),
-          selected.getMonth(),
-          selected.getDate()
-        )
-        const selectedDateEnd = new Date(
-          selected.getFullYear(),
-          selected.getMonth(),
-          selected.getDate(),
-          23,
-          59,
-          59
-        )
+        const selectedDayStart = selectedDay.clone().startOf('day')
+        const selectedDayEnd = selectedDay.clone().endOf('day')
 
-        return eventStart <= selectedDateEnd && eventEnd >= selectedDateStart
+        return (
+          eventStart.isSameOrBefore(selectedDayEnd) &&
+          eventEnd.isSameOrAfter(selectedDayStart)
+        )
       })
     : []
 
+  // 使用 moment 格式化事件日期
   const formattedEvents = events.map((event) => ({
     ...event,
-    start: new Date(event.start),
-    end: new Date(event.end),
+    start: moment(event.start).toDate(),
+    end: moment(event.end).toDate(),
   }))
 
-  // 添加选中日期的显示格式
+  // 使用 moment 格式化选中日期显示
   const formattedSelectedDate = selectedDate
     ? moment(selectedDate).format('YYYY年MM月DD日')
     : '未选择日期'
 
-  // 添加日期样式处理函数
+  // 使用 moment 处理日期样式
   const dayPropGetter = (date: Date) => {
-    // 将日期重置为 00:00:00 以便比较
-    const normalizedDate = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate()
-    )
-    const normalizedSelectedDate =
-      selectedDate &&
-      new Date(
-        selectedDate.getFullYear(),
-        selectedDate.getMonth(),
-        selectedDate.getDate()
-      )
+    const currentDate = moment(date)
+    const selectedDay = selectedDate && moment(selectedDate)
+    const today = moment()
 
     // 检查是否是选中的日期
-    if (
-      normalizedSelectedDate &&
-      normalizedDate.getTime() === normalizedSelectedDate.getTime()
-    ) {
+    if (selectedDay && currentDate.isSame(selectedDay, 'day')) {
       return {
-        className: 'selected-day',
-        style: {
-          backgroundColor: '#e3f2fd', // 浅蓝色背景
-          borderRadius: '4px',
-        },
+        className:
+          'bg-blue-50 rounded-md border-2 border-blue-200 font-semibold text-blue-700',
       }
     }
+
+    // 检查是否是今天
+    if (currentDate.isSame(today, 'day')) {
+      return {
+        className: 'bg-gray-50 rounded-md font-medium',
+      }
+    }
+
     return {}
   }
+
+  // 事件样式
+  const eventPropGetter = () => ({
+    className:
+      'text-xs py-0.5 px-1.5 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200',
+  })
 
   return (
     <div className="flex flex-col md:flex-row bg-gray-100">
@@ -129,11 +120,12 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
           onSelectEvent={handleSelectEvent}
           onSelectSlot={handleSelectSlot}
           dayPropGetter={dayPropGetter}
+          eventPropGetter={eventPropGetter}
+          className="rounded-lg [&_.rbc-event]:min-h-[20px] [&_.rbc-event-content]:text-xs [&_.rbc-event-content]:leading-4 [&_.rbc-show-more]:text-xs [&_.rbc-show-more]:text-blue-500 [&_.rbc-show-more]:bg-transparent [&_.rbc-show-more]:p-0.5 [&_.rbc-event]:my-0.5 [&_.rbc-event-label]:text-[0.7rem] [&_.rbc-event-label]:px-0.5 [&_.rbc-allday-cell]:max-h-[45px]"
           style={{
             height: '80vh',
             width: '100%',
           }}
-          className="rounded-lg"
         />
       </div>
       <div className="flex w-[400px] flex-col mx-4 mb-4">
@@ -186,19 +178,19 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
 }
 
 // 添加自定义样式
-const styles = `
-.selected-day {
-  transition: background-color 0.3s ease;
-}
+// const styles = `
+// .selected-day {
+//   transition: background-color 0.3s ease;
+// }
 
-.selected-day:hover {
-  background-color: #bbdefb !important;
-}
-`
+// .selected-day:hover {
+//   background-color: #bbdefb !important;
+// }
+// `
 
-// 将样式添加到组件中
-const styleSheet = document.createElement('style')
-styleSheet.innerText = styles
-document.head.appendChild(styleSheet)
+// // 将样式添加到组件中
+// const styleSheet = document.createElement('style')
+// styleSheet.innerText = styles
+// document.head.appendChild(styleSheet)
 
 export default CalendarComponent
