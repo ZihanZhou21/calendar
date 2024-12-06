@@ -1,27 +1,31 @@
 import { useState, useEffect } from 'react'
-import { formatDuration } from '../../utils/formatDuration'
+import { DailyTask } from '@type/task'
+import { formatDuration } from '@/utils/formatDuration'
 
-export default function DailyTaskCard({ task }) {
+interface DailyTaskCardProps {
+  task: DailyTask
+}
+
+const DailyTaskCard: React.FC<DailyTaskCardProps> = ({ task }) => {
   const {
     title,
     dailyDuration,
     remainingDuration: initialRemaining,
     isCompleted,
-    date,
   } = task
-
-  const [remainingDuration, setRemainingDuration] = useState(initialRemaining)
-  const [isRunning, setIsRunning] = useState(false)
+  const [remainingDuration, setRemainingDuration] =
+    useState<number>(initialRemaining)
+  const [isRunning, setIsRunning] = useState<boolean>(false)
 
   useEffect(() => {
-    let timer
+    let timer: NodeJS.Timeout
     if (isRunning && remainingDuration > 0) {
       timer = setInterval(() => {
         setRemainingDuration((prev) => prev - 1)
       }, 1000)
     }
     if (remainingDuration === 0) {
-      setIsRunning(false) // 自动停止计时
+      setIsRunning(false)
     }
     return () => clearInterval(timer)
   }, [isRunning, remainingDuration])
@@ -32,27 +36,29 @@ export default function DailyTaskCard({ task }) {
     }
   }
 
-  const isCompletedDisplay = remainingDuration === 0 || isCompleted
+  // 设置背景颜色
+  const backgroundColor = isCompleted
+    ? 'bg-yellow-500'
+    : isRunning
+    ? 'bg-green-500'
+    : 'bg-blue-500'
 
   return (
-    <div className="border p-4 rounded-lg shadow-sm bg-gray-50">
-      <h2 className="text-sm font-semibold truncate">{title}</h2>
-      <p className="text-xs">分配时长: {formatDuration(dailyDuration)}</p>
-      <p className="text-xs">
-        剩余时长: {formatDuration(remainingDuration)}{' '}
-        {isCompletedDisplay && (
-          <span className="text-green-500">（已完成）</span>
-        )}
-      </p>
-      <p className="text-xs">日期: {date}</p>
+    <div
+      className={`border p-4 rounded-lg shadow-sm text-white ${backgroundColor}`}>
+      <h2 className="text-lg font-semibold truncate">{title}</h2>
+      <p className="text-sm">每日分配时长: {formatDuration(dailyDuration)}</p>
+      <p className="text-sm">剩余时长: {formatDuration(remainingDuration)}</p>
       <button
         onClick={handleStartPause}
         className={`mt-2 text-xs px-4 py-1 rounded ${
-          isRunning ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
+          isRunning ? 'bg-red-500' : 'bg-white text-blue-500'
         }`}
-        disabled={isCompletedDisplay}>
-        {isCompletedDisplay ? '完成' : isRunning ? '暂停' : '开始'}
+        disabled={remainingDuration === 0}>
+        {remainingDuration === 0 ? '完成' : isRunning ? '暂停' : '开始'}
       </button>
     </div>
   )
 }
+
+export default DailyTaskCard

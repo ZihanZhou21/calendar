@@ -1,50 +1,39 @@
-import { formatDuration } from '../../utils/formatDuration'
+import { Task } from '@type/task'
+import { formatDuration } from '@/utils/formatDuration' // 引入格式化工具函数
 
-export default function TaskCard({ task }) {
-  const { title, totalDuration, remainingDuration, isCompleted, startDate } =
-    task
+interface TaskCardProps {
+  task: Task
+  onEdit: () => void
+  onDelete: () => void
+}
 
-  const handleEdit = () => {
-    console.log(`编辑任务: ${title}`)
-  }
-
-  const handleDelete = () => {
-    console.log(`删除任务: ${title}`)
-  }
-
-  const handleViewDetails = () => {
-    console.log(`查看任务详情: ${title}`)
-  }
+const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
+  const { title, totalDuration, remainingDuration, remainingDays } = task
 
   return (
-    <div className="border p-4 rounded-lg shadow-sm bg-gray-50">
-      <h2 className="text-sm font-semibold truncate">{title}</h2>
-      <p className="text-xs">总时长: {formatDuration(totalDuration)}</p>
-      <p className="text-xs">剩余时长: {formatDuration(remainingDuration)}</p>
-      <p className="text-xs">开始日期: {startDate}</p>
-      <p
-        className={
-          isCompleted ? 'text-green-500 text-xs' : 'text-red-500 text-xs'
-        }>
-        {isCompleted ? '已完成' : '未完成'}
-      </p>
-      <div className="mt-2 flex space-x-2">
+    <div className="border p-4 rounded-lg shadow-sm bg-blue-500 text-white relative">
+      <h2 className="text-lg font-semibold truncate">{title}</h2>
+      <p className="text-sm">总时长: {formatDuration(totalDuration)}</p>
+      <p className="text-sm">剩余时长: {formatDuration(remainingDuration)}</p>
+      <p className="text-sm">剩余天数: {remainingDays}天</p>
+      <div className="absolute top-2 right-2 space-x-2">
         <button
-          onClick={handleEdit}
-          className="text-blue-500 text-xs underline">
+          onClick={onEdit}
+          className="bg-white text-blue-500 px-2 py-1 rounded">
           编辑
         </button>
         <button
-          onClick={handleDelete}
-          className="text-red-500 text-xs underline">
+          onClick={() => {
+            if (confirm(`确定要删除任务 "${title}" 吗？`)) {
+              onDelete()
+            }
+          }}
+          className="bg-red-500 text-white px-2 py-1 rounded">
           删除
-        </button>
-        <button
-          onClick={handleViewDetails}
-          className="text-green-500 text-xs underline">
-          查看详情
         </button>
       </div>
     </div>
   )
 }
+
+export default TaskCard
