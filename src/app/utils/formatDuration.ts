@@ -5,7 +5,7 @@ import { Duration } from 'luxon'
  * @param {number} seconds 总秒数
  * @returns {string} 格式化后的时长
  */
-export const formatDuration = (seconds) => {
+export const formatDuration = (seconds: number): string => {
   const duration = Duration.fromObject({ seconds })
   return duration.toFormat('hh:mm:ss')
 }
