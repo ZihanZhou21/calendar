@@ -11,7 +11,7 @@ interface HeaderContentProps {
 
 export default function HeaderContent({ email }: HeaderContentProps) {
   const menuItems = [
-    { path: '/features', label: 'Features' },
+    { path: '/task', label: 'task' },
     { path: '/about', label: 'About' },
     { path: '/pricing', label: 'Pricing' },
   ]
