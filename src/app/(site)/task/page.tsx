@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import DailyTaskCard from '@/(site)/components/DailyTaskCard'
-import TaskCard from '@/(site)/components/TaskCard'
-import TaskForm from '@/(site)/components/TaskForm'
+import DailyTaskCard from '@/(site)/components/task/DailyTaskCard'
+import TaskCard from '@/(site)/components/task/TaskCard'
+import TaskForm from '@/(site)/components/task/TaskForm'
 import { Task, DailyTask } from '@type/task'
 
 export default function TaskManagementPage() {
@@ -18,6 +18,8 @@ export default function TaskManagementPage() {
     totalDays: number
   ) => {
     const taskId = tasks.length + 1
+
+    // 创建任务数据
     const newTask: Task = {
       id: taskId,
       title,
@@ -28,21 +30,20 @@ export default function TaskManagementPage() {
       startDate: new Date().toISOString().split('T')[0],
     }
 
-    const dailyTaskList: DailyTask[] = Array.from(
-      { length: totalDays },
-      (_, i) => ({
-        id: dailyTasks.length + i + 1,
-        taskId,
-        title: `${title} - Day ${i + 1}`,
-        dailyDuration: Math.floor(totalDuration / totalDays),
-        remainingDuration: Math.floor(totalDuration / totalDays),
-        isCompleted: false,
-        date: new Date(Date.now() + i * 86400000).toISOString().split('T')[0],
-      })
-    )
+    // 生成今日任务
+    const dailyTask: DailyTask = {
+      id: dailyTasks.length + 1,
+      taskId,
+      title,
+      dailyDuration: Math.floor(totalDuration / totalDays),
+      remainingDuration: Math.floor(totalDuration / totalDays),
+      isCompleted: false,
+      remainingDays: totalDays - 1, // 减去今天
+    }
 
+    // 更新状态
     setTasks([...tasks, newTask])
-    setDailyTasks([...dailyTasks, ...dailyTaskList])
+    setDailyTasks([...dailyTasks, dailyTask])
     setShowForm(false)
   }
 
@@ -79,25 +80,21 @@ export default function TaskManagementPage() {
     setDailyTasks((prevDailyTasks) =>
       prevDailyTasks
         .filter((task) => task.taskId !== id)
-        .concat(
-          Array.from({ length: totalDays }, (_, i) => ({
-            id: dailyTasks.length + i + 1,
-            taskId: id,
-            title: `${title} - Day ${i + 1}`,
-            dailyDuration: Math.floor(totalDuration / totalDays),
-            remainingDuration: Math.floor(totalDuration / totalDays),
-            isCompleted: false,
-            date: new Date(Date.now() + i * 86400000)
-              .toISOString()
-              .split('T')[0],
-          }))
-        )
+        .concat({
+          id: dailyTasks.length + 1,
+          taskId: id,
+          title,
+          dailyDuration: Math.floor(totalDuration / totalDays),
+          remainingDuration: Math.floor(totalDuration / totalDays),
+          isCompleted: false,
+          remainingDays: totalDays - 1,
+        })
     )
     setEditingTask(null)
   }
 
   const today = new Date().toISOString().split('T')[0]
-  const todayTasks = dailyTasks.filter((task) => task.date === today)
+  const todayTasks = dailyTasks.filter((task) => task.remainingDays >= 0)
 
   return (
     <div className="p-4 space-y-8 relative">

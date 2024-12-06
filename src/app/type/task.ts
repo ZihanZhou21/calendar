@@ -1,19 +1,21 @@
+// 定义任务数据结构
 export interface Task {
-  id: number
-  title: string
-  totalDuration: number // 总时长（秒）
-  totalDays: number // 总天数
-  remainingDuration: number // 剩余时长
+  id: number // 任务唯一标识符
+  title: string // 任务标题
+  totalDuration: number // 任务总时长（以秒为单位）
+  totalDays: number // 任务总天数
+  remainingDuration: number // 剩余总时长（以秒为单位）
   remainingDays: number // 剩余天数
-  startDate: string // 开始日期（ISO 格式字符串）
+  startDate: string // 任务开始日期（ISO 格式字符串）
 }
 
+// 定义每日任务数据结构
 export interface DailyTask {
-  id: number
-  taskId: number // 关联的任务 ID
-  title: string
-  dailyDuration: number // 每日分配时长（秒）
-  remainingDuration: number // 每日剩余时长（秒）
-  isCompleted: boolean
-  date: string // 日期（ISO 格式字符串）
+  id: number // 每日任务唯一标识符
+  taskId: number // 关联任务的 ID
+  title: string // 每日任务的标题
+  dailyDuration: number // 每日分配时长（以秒为单位）
+  remainingDuration: number // 每日剩余时长（以秒为单位）
+  isCompleted: boolean // 是否完成
+  remainingDays: number // 剩余天数
 }
