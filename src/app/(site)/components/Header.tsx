@@ -1,7 +1,7 @@
 // Header.tsx - server component
 'use server'
 import React from 'react'
-import { sessionOptions } from '@/app/libs/session'
+import { sessionOptions } from '@/libs/session'
 import HeaderContent from './HeaderContent'
 import { getIronSession } from 'iron-session'
 import { SessionData } from 'next-app-session/dist/types'

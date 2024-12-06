@@ -6,8 +6,8 @@ import DashboardNav from '../components/DashboardNav'
 import EventItem from '../components/EventItem'
 import EventTypeForm from '../components/EventTypeForm'
 import { Drawer, Button } from 'flowbite-react'
-import { IEvent } from '@/app/models/Event'
-import CalendarComponent from '@/app/(site)/components/Calendar'
+import { IEvent } from '@/models/Event'
+import CalendarComponent from '@/(site)/components/Calendar'
 
 interface EventFormData {
   title: string

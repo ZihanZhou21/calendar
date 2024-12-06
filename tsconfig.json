@@ -21,9 +21,13 @@
         "name": "next"
       }
     ],
+    "baseUrl": "./src/app",
     "paths": {
       "@/*": [
-        "./src/*"
+        "*"
+      ],
+      "@type/*": [
+        "type/*"
       ]
     },
     "target": "ES2017"
