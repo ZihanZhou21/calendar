@@ -1,0 +1,17 @@
+import { NextApiRequest, NextApiResponse } from 'next'
+import dbConnect from '@/utils/dbConnect'
+import DailyTask from '@/models/DailyTask'
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  await dbConnect()
+
+  try {
+    const dailyTasks = await DailyTask.find({})
+    res.status(200).json({ success: true, data: dailyTasks })
+  } catch (error) {
+    res.status(400).json({ success: false, error })
+  }
+}
