@@ -3,10 +3,8 @@ import dbConnect from '@/utils/dbConnect'
 import Task from '@/models/Task'
 
 // GET Task by ID
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { taskId: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ taskId: string }> }) {
+  const params = await props.params;
   const { taskId } = params // Access `taskId` immediately
   await dbConnect()
   try {
@@ -27,10 +25,8 @@ export async function GET(
 }
 
 // PUT: Update Task
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { taskId: string } }
-) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ taskId: string }> }) {
+  const params = await props.params;
   const { taskId } = params // Access `taskId` immediately
   await dbConnect()
   try {
@@ -55,10 +51,8 @@ export async function PUT(
 }
 
 // DELETE: Remove Task
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { taskId: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ taskId: string }> }) {
+  const params = await props.params;
   const { taskId } = params // Access `taskId` immediately
   await dbConnect()
   try {
