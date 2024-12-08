@@ -5,7 +5,7 @@ interface TaskFormProps {
     title: string,
     totalDuration: number, // 总时长以秒为单位
     totalDays: number
-  ) => void
+  ) => Promise<void> // 支持异步操作
   initialValues?: {
     title: string
     totalDuration: number // 总时长以秒为单位
@@ -24,19 +24,45 @@ const TaskForm: React.FC<TaskFormProps> = ({ onCreateTask, initialValues }) => {
   const [totalDays, setTotalDays] = useState<number>(
     initialValues?.totalDays || 1
   )
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const totalDuration = hours * 3600 + minutes * 60 // 换算为秒
-    onCreateTask(title, totalDuration, totalDays)
-    setTitle('')
-    setHours(0)
-    setMinutes(0)
-    setTotalDays(1)
+
+    const totalDuration = hours * 3600 + minutes * 60 // Convert to seconds
+    if (!title.trim()) {
+      setError('任务标题不能为空')
+      return
+    }
+    if (totalDuration <= 0) {
+      setError('总时长必须大于 0')
+      return
+    }
+    if (totalDays <= 0) {
+      setError('总天数必须大于 0')
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+    try {
+      await onCreateTask(title, totalDuration, totalDays)
+      setTitle('')
+      setHours(0)
+      setMinutes(0)
+      setTotalDays(1)
+    } catch (err) {
+      console.error('Failed to create task:', err)
+      setError('任务创建失败，请稍后重试。')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && <p className="text-red-500 text-sm">{error}</p>}
       <div>
         <label className="block text-sm font-medium">任务标题</label>
         <input
@@ -82,8 +108,9 @@ const TaskForm: React.FC<TaskFormProps> = ({ onCreateTask, initialValues }) => {
       </div>
       <button
         type="submit"
+        disabled={loading}
         className="bg-blue-500 text-white px-4 py-2 rounded">
-        提交
+        {loading ? '提交中...' : '提交'}
       </button>
     </form>
   )
