@@ -6,17 +6,20 @@ export interface IDailyTask extends Document {
   dailyDuration: number // 每日分配的时长（秒）
   remainingDuration: number // 剩余时长（秒）
   isCompleted: boolean // 是否完成
-  remainingDays: number // 剩余天数
+  // remainingDays: number // 剩余天数
 }
 
-const DailyTaskSchema = new Schema<IDailyTask>({
-  taskId: { type: mongoose.Types.ObjectId, ref: 'Task', required: true },
+// import mongoose from 'mongoose'
+
+const DailyTaskSchema = new mongoose.Schema({
+  taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task', required: true },
   title: { type: String, required: true },
   dailyDuration: { type: Number, required: true },
   remainingDuration: { type: Number, required: true },
   isCompleted: { type: Boolean, default: false },
-  remainingDays: { type: Number, required: true },
 })
 
 export default mongoose.models.DailyTask ||
-  model<IDailyTask>('DailyTask', DailyTaskSchema)
+  mongoose.model('DailyTask', DailyTaskSchema)
+// export default mongoose.models.DailyTask ||
+//   model<IDailyTask>('DailyTask', DailyTaskSchema)

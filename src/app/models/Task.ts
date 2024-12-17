@@ -14,7 +14,7 @@ const TaskSchema = new Schema<ITask>({
   totalDuration: { type: Number, required: true },
   totalDays: { type: Number, required: true },
   remainingDuration: { type: Number, required: true },
-  remainingDays: { type: Number, required: true },
+  remainingDays: { type: Number },
   startDate: { type: Date, required: true },
 })
 

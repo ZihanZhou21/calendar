@@ -11,11 +11,22 @@ export interface Task {
 
 // 定义每日任务数据结构
 export interface DailyTask {
-  id: string // 每日任务唯一标识符
-  taskId: number // 关联任务的 ID
+  _id: string // 每日任务唯一标识符
+  taskId: string // 关联任务的 ID
   title: string // 每日任务的标题
   dailyDuration: number // 每日分配时长（以秒为单位）
   remainingDuration: number // 每日剩余时长（以秒为单位）
   isCompleted: boolean // 是否完成
-  remainingDays: number // 剩余天数
+  // remainingDays: number // 剩余天数
+}
+// src/types/task.ts
+
+export interface TaskFormProps {
+  onCreateTask: (
+    title: string,
+    totalDuration: number,
+    totalDays: number
+  ) => Promise<void>
+  onCancel: () => void // 添加 onCancel 属性
+  initialValues?: Task // initialValues 是可选属性
 }

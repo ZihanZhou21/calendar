@@ -6,6 +6,7 @@ interface TaskFormProps {
     totalDuration: number, // 总时长以秒为单位
     totalDays: number
   ) => Promise<void> // 支持异步操作
+  onCancel: () => void // 新增 onCancel 属性，用于取消任务创建
   initialValues?: {
     title: string
     totalDuration: number // 总时长以秒为单位
@@ -13,7 +14,11 @@ interface TaskFormProps {
   }
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ onCreateTask, initialValues }) => {
+const TaskForm: React.FC<TaskFormProps> = ({
+  onCreateTask,
+  onCancel,
+  initialValues,
+}) => {
   const [title, setTitle] = useState<string>(initialValues?.title || '')
   const [hours, setHours] = useState<number>(
     Math.floor((initialValues?.totalDuration || 0) / 3600)
@@ -106,12 +111,20 @@ const TaskForm: React.FC<TaskFormProps> = ({ onCreateTask, initialValues }) => {
           required
         />
       </div>
-      <button
-        type="submit"
-        disabled={loading}
-        className="bg-blue-500 text-white px-4 py-2 rounded">
-        {loading ? '提交中...' : '提交'}
-      </button>
+      <div className="flex justify-end space-x-2">
+        <button
+          type="button"
+          onClick={onCancel} // 使用 onCancel 属性关闭表单
+          className="px-4 py-2 bg-gray-300 rounded">
+          取消
+        </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-500 text-white px-4 py-2 rounded">
+          {loading ? '提交中...' : '提交'}
+        </button>
+      </div>
     </form>
   )
 }

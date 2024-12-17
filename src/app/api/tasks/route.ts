@@ -1,54 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server'
-import dbConnect from '@/utils/dbConnect'
 import Task from '@/models/Task'
+import DailyTask from '@/models/DailyTask'
+import dbConnect from '@/utils/dbConnect'
 
-// GET: Retrieve all tasks
-export async function GET(req: NextRequest) {
-  await dbConnect()
-  try {
-    const tasks = await Task.find({})
-    return NextResponse.json({ success: true, data: tasks }, { status: 200 })
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 400 }
-    )
-  }
-}
-
-// POST: Create a new task
 export async function POST(req: NextRequest) {
   await dbConnect()
+
   try {
-    const body = await req.json()
+    const { title, totalDuration, totalDays } = await req.json()
 
-    // Validation of request body
-    const { title, totalDuration, totalDays } = body
-    if (!title || typeof title !== 'string') {
-      throw new Error('Invalid or missing "title"')
-    }
-    if (!totalDuration || typeof totalDuration !== 'number') {
-      throw new Error('Invalid or missing "totalDuration"')
-    }
-    if (!totalDays || typeof totalDays !== 'number') {
-      throw new Error('Invalid or missing "totalDays"')
-    }
+    // Step 1: 获取当前日期作为任务开始日期
+    const startDate = new Date()
 
-    // Create task
-    const task = await Task.create({
+    // Step 2: 创建任务
+    const newTask = await Task.create({
       title,
       totalDuration,
       totalDays,
-      remainingDuration: totalDuration,
-      remainingDays: totalDays,
-      startDate: new Date(),
+      remainingDuration: totalDuration, // 初始化剩余总时长
+      startDate, // 设置开始日期
+      remainingDays: totalDays, // 剩余天数初始化为总天数
     })
 
-    return NextResponse.json({ success: true, data: task }, { status: 201 })
+    // Step 3: 计算每日任务的配额
+    const dailyDuration = Math.floor(totalDuration / totalDays)
+
+    // Step 4: 创建第一个每日任务
+    const firstDailyTask = await DailyTask.create({
+      taskId: newTask._id, // 与任务关联
+      title: `${title} - Day 1`,
+      dailyDuration,
+      remainingDuration: dailyDuration,
+      isCompleted: false,
+    })
+
+    // Step 5: 返回任务和每日任务数据
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          task: newTask,
+          dailyTask: firstDailyTask,
+        },
+      },
+      { status: 201 }
+    )
   } catch (error: any) {
+    console.error('Error creating task:', error)
     return NextResponse.json(
       { success: false, error: error.message },
-      { status: 400 }
+      { status: 500 }
+    )
+  }
+}
+export async function GET(req: NextRequest) {
+  await dbConnect()
+  try {
+    // 获取所有任务
+    const tasks = await Task.find({})
+    return NextResponse.json({ success: true, data: tasks }, { status: 200 })
+  } catch (error: any) {
+    console.error('Error fetching tasks:', error)
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
     )
   }
 }

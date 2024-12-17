@@ -1,76 +1,68 @@
 import { NextRequest, NextResponse } from 'next/server'
-import dbConnect from '@/utils/dbConnect'
 import Task from '@/models/Task'
+import DailyTask from '@/models/DailyTask'
+import dbConnect from '@/utils/dbConnect'
 
-// GET Task by ID
-export async function GET(req: NextRequest, props: { params: Promise<{ taskId: string }> }) {
-  const params = await props.params;
-  const { taskId } = params // Access `taskId` immediately
+export async function PUT(
+  req: NextRequest,
+  context: { params: { taskId: string } }
+) {
   await dbConnect()
-  try {
-    const task = await Task.findById(taskId)
-    if (!task) {
-      return NextResponse.json(
-        { success: false, error: 'Task not found' },
-        { status: 404 }
-      )
-    }
-    return NextResponse.json({ success: true, data: task }, { status: 200 })
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 400 }
-    )
-  }
-}
 
-// PUT: Update Task
-export async function PUT(req: NextRequest, props: { params: Promise<{ taskId: string }> }) {
-  const params = await props.params;
-  const { taskId } = params // Access `taskId` immediately
-  await dbConnect()
   try {
+    const { params } = await context
+    const taskId = await params.taskId // 解构 taskId
     const body = await req.json()
-    const task = await Task.findByIdAndUpdate(taskId, body, {
+
+    const updatedTask = await Task.findByIdAndUpdate(taskId, body, {
       new: true,
       runValidators: true,
     })
-    if (!task) {
+    if (!updatedTask)
       return NextResponse.json(
-        { success: false, error: 'Task not found' },
+        { success: false, message: 'Task not found' },
         { status: 404 }
       )
-    }
-    return NextResponse.json({ success: true, data: task }, { status: 200 })
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 400 }
-    )
-  }
-}
 
-// DELETE: Remove Task
-export async function DELETE(req: NextRequest, props: { params: Promise<{ taskId: string }> }) {
-  const params = await props.params;
-  const { taskId } = params // Access `taskId` immediately
-  await dbConnect()
-  try {
-    const deletedTask = await Task.deleteOne({ _id: taskId })
-    if (!deletedTask.deletedCount) {
-      return NextResponse.json(
-        { success: false, error: 'Task not found' },
-        { status: 404 }
-      )
-    }
     return NextResponse.json(
-      { success: true, message: 'Task deleted successfully' },
+      { success: true, data: updatedTask },
       { status: 200 }
     )
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message },
-      { status: 400 }
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  context: { params: { taskId: string } }
+) {
+  await dbConnect()
+  try {
+    const { params } = context
+    const taskId = params.taskId // 解构 taskId
+
+    const deletedTask = await Task.findByIdAndDelete(taskId)
+    if (!deletedTask)
+      return NextResponse.json(
+        { success: false, message: 'Task not found' },
+        { status: 404 }
+      )
+
+    // 删除关联的 DailyTask
+    await DailyTask.deleteMany({ taskId })
+
+    return NextResponse.json({
+      success: true,
+      message: 'Task and associated daily tasks deleted successfully',
+    })
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
     )
   }
 }

@@ -1,4 +1,3 @@
-'use'
 import { useState, useEffect } from 'react'
 import { DailyTask } from '@type/task'
 import { formatDuration } from '@/utils/formatDuration'
@@ -6,7 +5,7 @@ import Task from '@/models/Task'
 
 interface DailyTaskCardProps {
   task: DailyTask
-  onComplete: (taskId: number) => Promise<void> // 更新任务完成状态
+  onComplete: (taskId: string) => Promise<void> // 更新任务完成状态
 }
 
 const DailyTaskCard: React.FC<DailyTaskCardProps> = ({ task, onComplete }) => {
@@ -27,7 +26,7 @@ const DailyTaskCard: React.FC<DailyTaskCardProps> = ({ task, onComplete }) => {
     if (remainingDuration === 0 && !isCompleted) {
       setIsCompleted(true) // 标记任务完成
       setIsRunning(false) // 停止倒计时
-      onComplete(task.id) // 通知后端任务完成
+      onComplete(task._id) // 通知后端任务完成
     }
     return () => clearInterval(timer)
   }, [isRunning, remainingDuration, onComplete, isCompleted, task])
