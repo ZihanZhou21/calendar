@@ -11,7 +11,7 @@ export async function PUT(
 
   try {
     const { params } = await context
-    const taskId = await params.taskId // 解构 taskId
+    const taskId = await (await params).taskId // 解构 taskId
     const body = await req.json()
 
     const updatedTask = await Task.findByIdAndUpdate(taskId, body, {
@@ -43,7 +43,7 @@ export async function DELETE(
   await dbConnect()
   try {
     const { params } = context
-    const taskId = params.taskId // 解构 taskId
+    const taskId = (await params).taskId // 解构 taskId
 
     const deletedTask = await Task.findByIdAndDelete(taskId)
     if (!deletedTask)
