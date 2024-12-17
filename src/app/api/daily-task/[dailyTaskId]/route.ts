@@ -3,10 +3,8 @@ import DailyTask from '@/models/DailyTask'
 import Task from '@/models/Task'
 import dbConnect from '@/utils/dbConnect'
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { dailyTaskId: string } }
-) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ dailyTaskId: string }> }) {
+  const params = await props.params;
   await dbConnect()
   try {
     const { dailyTaskId } = params
@@ -55,10 +53,8 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { dailyTaskId: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ dailyTaskId: string }> }) {
+  const params = await props.params;
   await dbConnect()
   try {
     const { dailyTaskId } = params

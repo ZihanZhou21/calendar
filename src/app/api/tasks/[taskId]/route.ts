@@ -5,7 +5,7 @@ import dbConnect from '@/utils/dbConnect'
 
 export async function PUT(
   req: NextRequest,
-  context: { params: { taskId: string } }
+  context: { params: Promise<{ taskId: string }> }
 ) {
   await dbConnect()
 
@@ -38,7 +38,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: { taskId: string } }
+  context: { params: Promise<{ taskId: string }> }
 ) {
   await dbConnect()
   try {
