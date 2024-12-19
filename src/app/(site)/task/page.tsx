@@ -100,6 +100,7 @@ export default function TaskManagementPage() {
     totalDays: number
   ) => {
     const remainingDuration = totalDuration
+    const remainingDays = totalDays
     try {
       const response = await fetch(`${taskApi}/${taskId}`, {
         method: 'PUT',
@@ -109,6 +110,7 @@ export default function TaskManagementPage() {
           totalDuration,
           remainingDuration,
           totalDays,
+          remainingDays,
         }),
       })
 
