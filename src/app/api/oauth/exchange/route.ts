@@ -1,6 +1,6 @@
-import { nylas, nylasConfig } from '@/app/libs/nylas'
+import { nylas, nylasConfig } from '../../../libs/nylas'
 import { NextApiRequest } from 'next'
-import { sessionOptions } from '@/app/libs/session'
+import { sessionOptions } from '../../../libs/session'
 import { redirect } from 'next/navigation'
 import { getIronSession } from 'iron-session'
 
@@ -12,12 +12,23 @@ type SessionData = {
 export async function GET(req: NextApiRequest) {
   console.log('Received callback from Nylas')
   // const code = req.query.code
+  if (!req.url) {
+    return Response.json('Request URL is missing', {
+      status: 400,
+    })
+  }
   const url = new URL(req.url)
   const code = url.searchParams.get('code')
   if (!code) {
     // res.status(400).send('No authorization code returned from Nylas')
     return Response.json('no authrorization code return form Nylas', {
       status: 400,
+    })
+  }
+
+  if (!nylasConfig.apiKey || !nylasConfig.clientId) {
+    return Response.json('Nylas configuration is missing', {
+      status: 500,
     })
   }
 

@@ -3,38 +3,39 @@ import DailyTask from '@/models/DailyTask'
 import Task from '@/models/Task'
 import dbConnect from '@/utils/dbConnect'
 
-export async function PUT(req: NextRequest) {
+export async function PUT() {
   await dbConnect()
+
   try {
-    const incompleteDailyTasks = await DailyTask.find({ isCompleted: false })
-    for (const dailyTask of incompleteDailyTasks) {
-      const task = await Task.findById(dailyTask.taskId)
-      if (task) {
-        task.remainingDuration += dailyTask.remainingDuration
-        await task.save()
-      }
-      await DailyTask.deleteOne({ _id: dailyTask._id })
-    }
+    // 删除所有未完成的每日任务
+    await DailyTask.deleteMany({})
+
+    // 获取所有未完成的主任务
     const tasks = await Task.find({ remainingDuration: { $gt: 0 } })
+
+    const newDailyTasks = []
+
     for (const task of tasks) {
       const dailyDuration = Math.min(
         task.remainingDuration,
         Math.floor(task.totalDuration / task.totalDays)
       )
-      await DailyTask.create({
+
+      const newDailyTask = await DailyTask.create({
         taskId: task._id,
-        title: `${task.title} - New Day`,
+        title: `${task.title} - 新每日任务`,
         dailyDuration,
         remainingDuration: dailyDuration,
         isCompleted: false,
       })
-      task.remainingDuration -= dailyDuration
-      await task.save()
+
+      newDailyTasks.push(newDailyTask)
     }
-    return NextResponse.json({
-      success: true,
-      message: 'Daily tasks reset successfully',
-    })
+
+    return NextResponse.json(
+      { success: true, data: newDailyTasks },
+      { status: 200 }
+    )
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message },

@@ -10,7 +10,6 @@ interface TaskCardProps {
 const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
   const { title, totalDuration, remainingDuration, remainingDays, totalDays } =
     task
-  console.log(task, 'taskacard')
   const handleDelete = async () => {
     if (confirm(`确定要删除任务 "${title}" 吗？`)) {
       try {

@@ -5,6 +5,7 @@ import TaskCard from '@/(site)/components/task/TaskCard'
 import DailyTaskCard from '@/(site)/components/task/DailyTaskCard'
 import TaskForm from '@/(site)/components/task/TaskForm'
 import { Task, DailyTask } from '@type/task'
+import { GET } from '@/api/auth/route'
 
 export default function TaskManagementPage() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -19,7 +20,7 @@ export default function TaskManagementPage() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch(taskApi)
+        const response = await fetch(taskApi, { method: 'GET' })
         const data = await response.json()
         if (data.success) {
           setTasks(data.data)
@@ -33,7 +34,7 @@ export default function TaskManagementPage() {
 
     const fetchDailyTasks = async () => {
       try {
-        const response = await fetch(dailyTaskApi)
+        const response = await fetch(dailyTaskApi, { method: 'GET' })
         const data = await response.json()
         if (data.success) {
           setDailyTasks(data.data)
@@ -48,7 +49,7 @@ export default function TaskManagementPage() {
     fetchTasks()
     fetchDailyTasks()
   }, [])
-
+  console.log(tasks, dailyTasks)
   const createTask = async (
     title: string,
     totalDuration: number,
@@ -121,13 +122,25 @@ export default function TaskManagementPage() {
       setError('编辑任务失败，请稍后重试。')
     }
   }
-
-  const completeDailyTask = async (dailyTaskId: string) => {
+  const completeDailyTask = async (
+    dailyTaskId: string,
+    remainingDuration: number,
+    totalDuration: number,
+    taskId: string
+  ) => {
     try {
+      const currentTask = dailyTasks.find((d) => d._id === dailyTaskId)
+      if (currentTask && currentTask.isCompleted) {
+        return
+      }
+
+      // 根据剩余时间计算完成状态，这里如果为0则isCompleted应为true
+      const isCompleted = remainingDuration === 0
+
       const response = await fetch(`${dailyTaskApi}/${dailyTaskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isCompleted: true }),
+        body: JSON.stringify({ isCompleted, remainingDuration }),
       })
 
       const data = await response.json()
@@ -135,18 +148,45 @@ export default function TaskManagementPage() {
         setDailyTasks((prev) =>
           prev.map((dailyTask) =>
             dailyTask._id === dailyTaskId
-              ? { ...dailyTask, isCompleted: true }
+              ? { ...dailyTask, isCompleted, remainingDuration }
               : dailyTask
           )
         )
+
+        // 计算本次完成的时长
+        const completedDuration = totalDuration - remainingDuration
+
+        // 更新主任务信息
+        const taskResponse = await fetch(`${taskApi}/${taskId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ completedDuration }),
+        })
+
+        const taskData = await taskResponse.json()
+        if (taskData.success) {
+          setTasks((prev) =>
+            prev.map((task) =>
+              task._id === taskId
+                ? {
+                    ...task,
+                    remainingDuration: taskData.data.remainingDuration,
+                  }
+                : task
+            )
+          )
+        } else {
+          setError('更新主任务失败，请稍后重试。')
+        }
       } else {
-        setError('每日任务完成失败，请稍后重试。')
+        setError('每日任务状态更新失败，请稍后重试。')
       }
-    } catch {
-      setError('每日任务完成失败，请稍后重试。')
+    } catch (error) {
+      console.error(error)
+      setError('请求过程中出现错误，请稍后重试。')
     }
   }
-
+  const [isLoading, setIsLoading] = useState(false)
   return (
     <div className="container mx-auto p-4">
       {error && <p className="text-red-500">{error}</p>}
@@ -190,7 +230,35 @@ export default function TaskManagementPage() {
           <DailyTaskCard
             key={dailyTask._id}
             task={dailyTask}
-            onComplete={() => completeDailyTask(dailyTask._id)}
+            onComplete={async (dailyTaskId, remainingDuration) => {
+              try {
+                // 如果每日任务已经完成，直接返回，不重复扣除主任务时间
+                if (dailyTask.isCompleted) {
+                  return
+                }
+
+                setIsLoading(true)
+                await completeDailyTask(
+                  dailyTaskId,
+                  remainingDuration,
+                  dailyTask.dailyDuration,
+                  dailyTask.taskId
+                )
+
+                // 只有在成功完成任务后才更新前端状态
+                const updatedTasks = dailyTasks.map((task) =>
+                  task._id === dailyTaskId
+                    ? { ...task, isCompleted: true }
+                    : task
+                )
+                setDailyTasks(updatedTasks)
+              } catch (error) {
+                console.error('Failed to complete daily task:', error)
+                // Add error handling/notification here
+              } finally {
+                setIsLoading(false)
+              }
+            }}
           />
         ))}
       </div>
