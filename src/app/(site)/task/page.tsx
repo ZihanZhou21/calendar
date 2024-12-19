@@ -99,11 +99,17 @@ export default function TaskManagementPage() {
     totalDuration: number,
     totalDays: number
   ) => {
+    const remainingDuration = totalDuration
     try {
       const response = await fetch(`${taskApi}/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, totalDuration, totalDays }),
+        body: JSON.stringify({
+          title,
+          totalDuration,
+          remainingDuration,
+          totalDays,
+        }),
       })
 
       const data = await response.json()
@@ -212,55 +218,59 @@ export default function TaskManagementPage() {
       )}
       <div>
         <h2 className="text-xl font-bold mb-2">任务列表</h2>
-        {tasks.map((task) => (
-          <TaskCard
-            key={task._id}
-            task={task}
-            onDelete={() => deleteTask(task._id)}
-            onEdit={() => {
-              setEditingTask(task)
-              setShowForm(true)
-            }}
-          />
-        ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {tasks.map((task) => (
+            <TaskCard
+              key={task._id}
+              task={task}
+              onDelete={() => deleteTask(task._id)}
+              onEdit={() => {
+                setEditingTask(task)
+                setShowForm(true)
+              }}
+            />
+          ))}
+        </div>
       </div>
       <div>
         <h2 className="text-xl font-bold mt-6 mb-2">每日任务列表</h2>
-        {dailyTasks.map((dailyTask) => (
-          <DailyTaskCard
-            key={dailyTask._id}
-            task={dailyTask}
-            onComplete={async (dailyTaskId, remainingDuration) => {
-              try {
-                // 如果每日任务已经完成，直接返回，不重复扣除主任务时间
-                if (dailyTask.isCompleted) {
-                  return
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {dailyTasks.map((dailyTask) => (
+            <DailyTaskCard
+              key={dailyTask._id}
+              task={dailyTask}
+              onComplete={async (dailyTaskId, remainingDuration) => {
+                try {
+                  // 如果每日任务已经完成，直接返回，不重复扣除主任务时间
+                  if (dailyTask.isCompleted) {
+                    return
+                  }
+
+                  setIsLoading(true)
+                  await completeDailyTask(
+                    dailyTaskId,
+                    remainingDuration,
+                    dailyTask.dailyDuration,
+                    dailyTask.taskId
+                  )
+
+                  // 只有在成功完成任务后才更新前端状态
+                  const updatedTasks = dailyTasks.map((task) =>
+                    task._id === dailyTaskId
+                      ? { ...task, isCompleted: true }
+                      : task
+                  )
+                  setDailyTasks(updatedTasks)
+                } catch (error) {
+                  console.error('Failed to complete daily task:', error)
+                  // Add error handling/notification here
+                } finally {
+                  setIsLoading(false)
                 }
-
-                setIsLoading(true)
-                await completeDailyTask(
-                  dailyTaskId,
-                  remainingDuration,
-                  dailyTask.dailyDuration,
-                  dailyTask.taskId
-                )
-
-                // 只有在成功完成任务后才更新前端状态
-                const updatedTasks = dailyTasks.map((task) =>
-                  task._id === dailyTaskId
-                    ? { ...task, isCompleted: true }
-                    : task
-                )
-                setDailyTasks(updatedTasks)
-              } catch (error) {
-                console.error('Failed to complete daily task:', error)
-                // Add error handling/notification here
-              } finally {
-                setIsLoading(false)
-              }
-            }}
-          />
-        ))}
+              }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   )

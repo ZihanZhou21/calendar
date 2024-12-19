@@ -1,15 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface TaskFormProps {
   onCreateTask: (
     title: string,
-    totalDuration: number, // 总时长以秒为单位
+    totalDuration: number,
     totalDays: number
-  ) => Promise<void> // 支持异步操作
-  onCancel: () => void // 新增 onCancel 属性，用于取消任务创建
+  ) => Promise<void>
+  onCancel: () => void
   initialValues?: {
     title: string
-    totalDuration: number // 总时长以秒为单位
+    totalDuration: number
     totalDays: number
   }
 }
@@ -34,8 +34,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    const totalDuration = hours * 3600 + minutes * 60 // Convert to seconds
+    const totalDuration = hours * 3600 + minutes * 60
     if (!title.trim()) {
       setError('任务标题不能为空')
       return
@@ -66,66 +65,76 @@ const TaskForm: React.FC<TaskFormProps> = ({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-      <div>
-        <label className="block text-sm font-medium">任务标题</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="border p-2 rounded w-full"
-          required
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium">任务总时长</label>
-        <div className="flex space-x-2">
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      {/* 遮罩层 */}
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        onClick={onCancel}></div>
+
+      {/* 表单内容 */}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded shadow-lg z-50 space-y-4 max-w-md w-full">
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <div>
+          <label className="block text-sm font-medium">任务标题</label>
           <input
-            type="number"
-            value={hours}
-            onChange={(e) => setHours(Math.max(0, Number(e.target.value)))}
-            className="border p-2 rounded w-1/2"
-            placeholder="小时"
-            required
-          />
-          <input
-            type="number"
-            value={minutes}
-            onChange={(e) =>
-              setMinutes(Math.max(0, Math.min(59, Number(e.target.value))))
-            }
-            className="border p-2 rounded w-1/2"
-            placeholder="分钟"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="border p-2 rounded w-full"
             required
           />
         </div>
-      </div>
-      <div>
-        <label className="block text-sm font-medium">任务总天数</label>
-        <input
-          type="number"
-          value={totalDays}
-          onChange={(e) => setTotalDays(Math.max(1, Number(e.target.value)))}
-          className="border p-2 rounded w-full"
-          required
-        />
-      </div>
-      <div className="flex justify-end space-x-2">
-        <button
-          type="button"
-          onClick={onCancel} // 使用 onCancel 属性关闭表单
-          className="px-4 py-2 bg-gray-300 rounded">
-          取消
-        </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded">
-          {loading ? '提交中...' : '提交'}
-        </button>
-      </div>
-    </form>
+        <div>
+          <label className="block text-sm font-medium">任务总时长</label>
+          <div className="flex space-x-2">
+            <input
+              type="number"
+              value={hours}
+              onChange={(e) => setHours(Math.max(0, Number(e.target.value)))}
+              className="border p-2 rounded w-1/2"
+              placeholder="小时"
+              required
+            />
+            <input
+              type="number"
+              value={minutes}
+              onChange={(e) =>
+                setMinutes(Math.max(0, Math.min(59, Number(e.target.value))))
+              }
+              className="border p-2 rounded w-1/2"
+              placeholder="分钟"
+              required
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium">任务总天数</label>
+          <input
+            type="number"
+            value={totalDays}
+            onChange={(e) => setTotalDays(Math.max(1, Number(e.target.value)))}
+            className="border p-2 rounded w-full"
+            required
+          />
+        </div>
+        <div className="flex justify-end space-x-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 bg-gray-300 rounded">
+            取消
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-blue-500 text-white px-4 py-2 rounded">
+            {loading ? '提交中...' : '提交'}
+          </button>
+        </div>
+      </form>
+    </div>
   )
 }
 
