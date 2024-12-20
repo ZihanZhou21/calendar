@@ -1,42 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import DailyTask from '@/models/DailyTask'
-import Task from '@/models/Task'
 import dbConnect from '@/utils/dbConnect'
 
-export async function PUT() {
+export async function GET(req: NextRequest) {
   await dbConnect()
-
   try {
-    // 删除所有未完成的每日任务
-    await DailyTask.deleteMany({})
+    // 查询所有每日任务
+    const dailyTasks = await DailyTask.find({})
 
-    // 获取所有未完成的主任务
-    const tasks = await Task.find({ remainingDuration: { $gt: 0 } })
-
-    const newDailyTasks = []
-
-    for (const task of tasks) {
-      const dailyDuration = Math.min(
-        task.remainingDuration,
-        Math.floor(task.totalDuration / task.totalDays)
-      )
-
-      const newDailyTask = await DailyTask.create({
-        taskId: task._id,
-        title: `${task.title} - 新每日任务`,
-        dailyDuration,
-        remainingDuration: dailyDuration,
-        isCompleted: false,
-      })
-
-      newDailyTasks.push(newDailyTask)
+    // 假设每日任务在新的一天需要将remainingDuration重置为dailyDuration，并且将isCompleted重置为false
+    for (const dailyTask of dailyTasks) {
+      // 更新逻辑：新的一天开始，将剩余时长回置
+      dailyTask.remainingDuration = dailyTask.dailyDuration
+      dailyTask.isCompleted = false
+      await dailyTask.save()
     }
 
-    return NextResponse.json(
-      { success: true, data: newDailyTasks },
-      { status: 200 }
-    )
+    return NextResponse.json({ success: true, message: '每日任务已重置' })
   } catch (error: any) {
+    console.error('Error resetting daily tasks:', error)
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }

@@ -5,7 +5,6 @@ import TaskCard from '@/(site)/components/task/TaskCard'
 import DailyTaskCard from '@/(site)/components/task/DailyTaskCard'
 import TaskForm from '@/(site)/components/task/TaskForm'
 import { Task, DailyTask } from '@type/task'
-import { GET } from '@/api/auth/route'
 
 export default function TaskManagementPage() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -13,6 +12,7 @@ export default function TaskManagementPage() {
   const [showForm, setShowForm] = useState<boolean>(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const taskApi = '/api/tasks'
   const dailyTaskApi = '/api/daily-tasks'
@@ -49,7 +49,7 @@ export default function TaskManagementPage() {
     fetchTasks()
     fetchDailyTasks()
   }, [])
-  console.log(tasks, dailyTasks)
+
   const createTask = async (
     title: string,
     totalDuration: number,
@@ -64,9 +64,7 @@ export default function TaskManagementPage() {
 
       const data = await response.json()
       if (data.success) {
-        // 添加任务到任务列表
         setTasks((prev) => [...prev, data.data.task])
-        // 添加每日任务到每日任务列表
         setDailyTasks((prev) => [...prev, data.data.dailyTask])
         setShowForm(false)
       } else {
@@ -78,6 +76,7 @@ export default function TaskManagementPage() {
   }
 
   const deleteTask = async (taskId: string) => {
+    console.log('ss')
     try {
       const response = await fetch(`${taskApi}/${taskId}`, { method: 'DELETE' })
       if (response.ok) {
@@ -130,21 +129,90 @@ export default function TaskManagementPage() {
       setError('编辑任务失败，请稍后重试。')
     }
   }
-  const completeDailyTask = async (
+
+  // const completeDailyTask = async (
+  //   dailyTaskId: string,
+  //   remainingDuration: number,
+  //   totalDuration: number,
+  //   taskId: string
+  // ) => {
+  //   try {
+  //     const currentTask = dailyTasks.find((d) => d._id === dailyTaskId)
+  //     if (currentTask && currentTask.isCompleted) {
+  //       return
+  //     }
+
+  //     const isCompleted = remainingDuration === 0
+
+  //     const response = await fetch(`${dailyTaskApi}/${dailyTaskId}`, {
+  //       method: 'PUT',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ isCompleted, remainingDuration }),
+  //     })
+
+  //     const data = await response.json()
+  //     if (data.success) {
+  //       setDailyTasks((prev) =>
+  //         prev.map((dailyTask) =>
+  //           dailyTask._id === dailyTaskId
+  //             ? { ...dailyTask, isCompleted, remainingDuration }
+  //             : dailyTask
+  //         )
+  //       )
+
+  //       const completedDuration = totalDuration - remainingDuration
+
+  //       const taskResponse = await fetch(`${taskApi}/${taskId}`, {
+  //         method: 'PUT',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify({ completedDuration }),
+  //       })
+
+  //       const taskData = await taskResponse.json()
+  //       if (taskData.success) {
+  //         setTasks((prev) =>
+  //           prev.map((task) =>
+  //             task._id === taskId
+  //               ? {
+  //                   ...task,
+  //                   remainingDuration: taskData.data.remainingDuration,
+  //                 }
+  //               : task
+  //           )
+  //         )
+  //       } else {
+  //         setError('更新主任务失败，请稍后重试。')
+  //       }
+  //     } else {
+  //       setError('每日任务状态更新失败，请稍后重试。')
+  //     }
+  //   } catch (error) {
+  //     console.error(error)
+  //     setError('请求过程中出现错误，请稍后重试。')
+  //   }
+  // }
+
+  // 新增暂停函数
+  const pauseDailyTask = async (
     dailyTaskId: string,
     remainingDuration: number,
-    totalDuration: number,
+    dailyDuration: number,
     taskId: string
   ) => {
     try {
-      const currentTask = dailyTasks.find((d) => d._id === dailyTaskId)
-      if (currentTask && currentTask.isCompleted) {
+      // 在更新前获取当前每日任务
+      const currentDailyTask = dailyTasks.find((d) => d._id === dailyTaskId)
+      if (!currentDailyTask) {
+        setError('未找到对应的每日任务')
         return
       }
+      const oldDailyRemaining = currentDailyTask.remainingDuration
 
-      // 根据剩余时间计算完成状态，这里如果为0则isCompleted应为true
+      // 计算本次暂停使用的时长差值
+      const usedDifference = oldDailyRemaining - remainingDuration
+
+      // 更新每日任务
       const isCompleted = remainingDuration === 0
-
       const response = await fetch(`${dailyTaskApi}/${dailyTaskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -152,49 +220,56 @@ export default function TaskManagementPage() {
       })
 
       const data = await response.json()
-      if (data.success) {
-        setDailyTasks((prev) =>
-          prev.map((dailyTask) =>
-            dailyTask._id === dailyTaskId
-              ? { ...dailyTask, isCompleted, remainingDuration }
-              : dailyTask
+      if (!data.success) {
+        setError('暂停每日任务失败，请稍后重试。')
+        return
+      }
+
+      // 更新前端的dailyTasks状态
+      setDailyTasks((prev) =>
+        prev.map((dt) =>
+          dt._id === dailyTaskId
+            ? { ...dt, isCompleted, remainingDuration }
+            : dt
+        )
+      )
+
+      // 找到对应的主任务
+      const currentTask = tasks.find((t) => t._id === taskId)
+      if (!currentTask) {
+        setError('未找到对应的主任务')
+        return
+      }
+
+      // 基于主任务当前的remainingDuration计算新的剩余时间
+      const oldTaskRemaining = currentTask.remainingDuration
+      const newRemainingDuration = oldTaskRemaining - usedDifference
+
+      // 向后端发送更新主任务的请求，只传remainingDuration
+      const taskResponse = await fetch(`${taskApi}/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ remainingDuration: newRemainingDuration }),
+      })
+
+      const taskData = await taskResponse.json()
+      if (taskData.success) {
+        // 更新前端的tasks状态
+        setTasks((prev) =>
+          prev.map((t) =>
+            t._id === taskId
+              ? { ...t, remainingDuration: taskData.data.remainingDuration }
+              : t
           )
         )
-
-        // 计算本次完成的时长
-        const completedDuration = totalDuration - remainingDuration
-
-        // 更新主任务信息
-        const taskResponse = await fetch(`${taskApi}/${taskId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ completedDuration }),
-        })
-
-        const taskData = await taskResponse.json()
-        if (taskData.success) {
-          setTasks((prev) =>
-            prev.map((task) =>
-              task._id === taskId
-                ? {
-                    ...task,
-                    remainingDuration: taskData.data.remainingDuration,
-                  }
-                : task
-            )
-          )
-        } else {
-          setError('更新主任务失败，请稍后重试。')
-        }
       } else {
-        setError('每日任务状态更新失败，请稍后重试。')
+        setError('更新主任务失败，请稍后重试。')
       }
     } catch (error) {
       console.error(error)
       setError('请求过程中出现错误，请稍后重试。')
     }
   }
-  const [isLoading, setIsLoading] = useState(false)
   return (
     <div className="container mx-auto p-4">
       {error && <p className="text-red-500">{error}</p>}
@@ -218,6 +293,8 @@ export default function TaskManagementPage() {
           initialValues={editingTask || undefined}
         />
       )}
+
+      {/* 任务列表 */}
       <div>
         <h2 className="text-xl font-bold mb-2">任务列表</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -234,6 +311,8 @@ export default function TaskManagementPage() {
           ))}
         </div>
       </div>
+
+      {/* 每日任务列表 */}
       <div>
         <h2 className="text-xl font-bold mt-6 mb-2">每日任务列表</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -243,20 +322,16 @@ export default function TaskManagementPage() {
               task={dailyTask}
               onComplete={async (dailyTaskId, remainingDuration) => {
                 try {
-                  // 如果每日任务已经完成，直接返回，不重复扣除主任务时间
                   if (dailyTask.isCompleted) {
                     return
                   }
-
                   setIsLoading(true)
-                  await completeDailyTask(
+                  await pauseDailyTask(
                     dailyTaskId,
                     remainingDuration,
                     dailyTask.dailyDuration,
                     dailyTask.taskId
                   )
-
-                  // 只有在成功完成任务后才更新前端状态
                   const updatedTasks = dailyTasks.map((task) =>
                     task._id === dailyTaskId
                       ? { ...task, isCompleted: true }
@@ -265,7 +340,25 @@ export default function TaskManagementPage() {
                   setDailyTasks(updatedTasks)
                 } catch (error) {
                   console.error('Failed to complete daily task:', error)
-                  // Add error handling/notification here
+                } finally {
+                  setIsLoading(false)
+                }
+              }}
+              // 定义onPause回调
+              onPause={async (dailyTaskId, remainingDuration) => {
+                try {
+                  if (dailyTask.isCompleted) {
+                    return
+                  }
+                  setIsLoading(true)
+                  await pauseDailyTask(
+                    dailyTaskId,
+                    remainingDuration,
+                    dailyTask.dailyDuration,
+                    dailyTask.taskId
+                  )
+                } catch (error) {
+                  console.error('Failed to pause daily task:', error)
                 } finally {
                   setIsLoading(false)
                 }

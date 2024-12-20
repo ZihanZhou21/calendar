@@ -10,8 +10,8 @@ export async function PUT(
   await dbConnect()
 
   try {
-    const { params } = await context
-    const taskId = await (await params).taskId // 解构 taskId
+    const { params } = context
+    const taskId = (await params).taskId // 解构 taskId
     const body = await req.json()
 
     const updatedTask = await Task.findByIdAndUpdate(taskId, body, {

@@ -15,8 +15,8 @@ export async function PUT(
   await dbConnect()
 
   try {
-    const { params } = await context
-    const dailyTaskId = await (await params).dailyTaskId
+    const { params } = context
+    const dailyTaskId = (await params).dailyTaskId
     const body: CompleteDailyTaskBody = await req.json()
     const { isCompleted, remainingDuration } = body
 

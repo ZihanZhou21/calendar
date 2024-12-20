@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react'
 import { DailyTask } from '@type/task'
 import { formatDuration } from '@/utils/formatDuration'
-import Task from '@/models/Task'
 
 interface DailyTaskCardProps {
   task: DailyTask
-  onComplete: (taskId: string, remainingDuration: number) => Promise<void> // 接收两个参数
+  onComplete: (taskId: string, remainingDuration: number) => Promise<void>
+  onPause?: (taskId: string, remainingDuration: number) => Promise<void>
 }
 
-const DailyTaskCard: React.FC<DailyTaskCardProps> = ({ task, onComplete }) => {
+const DailyTaskCard: React.FC<DailyTaskCardProps> = ({
+  task,
+  onComplete,
+  onPause,
+}) => {
   const { title, dailyDuration, remainingDuration: initialRemaining } = task
 
   const [remainingDuration, setRemainingDuration] =
@@ -18,13 +22,15 @@ const DailyTaskCard: React.FC<DailyTaskCardProps> = ({ task, onComplete }) => {
 
   useEffect(() => {
     let timer: NodeJS.Timeout
+
     const handleComplete = async () => {
       try {
-        await onComplete(task._id, remainingDuration) // 通知后端任务已完成，并传递剩余时间
+        await onComplete(task._id, remainingDuration)
       } catch (error) {
         console.error('标记任务完成失败:', error)
       }
     }
+
     if (isRunning && remainingDuration > 0) {
       timer = setInterval(() => {
         setRemainingDuration((prev) => prev - 1)
@@ -34,15 +40,26 @@ const DailyTaskCard: React.FC<DailyTaskCardProps> = ({ task, onComplete }) => {
     if (remainingDuration === 0 && !isCompleted) {
       setIsRunning(false)
       setIsCompleted(true)
-      handleComplete() // 调用完成处理函数
+      handleComplete()
     }
 
     return () => clearInterval(timer)
   }, [isRunning, remainingDuration, isCompleted, onComplete, task._id])
 
-  const handleStartPause = () => {
-    if (remainingDuration > 0) {
-      setIsRunning((prev) => !prev)
+  const handleStart = () => {
+    if (!isCompleted && remainingDuration > 0) {
+      setIsRunning(true)
+    }
+  }
+
+  const handlePause = async () => {
+    setIsRunning(false)
+    if (onPause) {
+      try {
+        await onPause(task._id, remainingDuration)
+      } catch (error) {
+        console.error('暂停每日任务失败:', error)
+      }
     }
   }
 
@@ -56,7 +73,7 @@ const DailyTaskCard: React.FC<DailyTaskCardProps> = ({ task, onComplete }) => {
     <div
       className={`border p-4 rounded-lg shadow-sm text-white ${backgroundColor}`}>
       <h2 className="text-lg font-semibold truncate">{title}</h2>
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <div>
           <p className="text-sm">
             每日分配时长: {formatDuration(dailyDuration)}
@@ -66,14 +83,27 @@ const DailyTaskCard: React.FC<DailyTaskCardProps> = ({ task, onComplete }) => {
             {isCompleted ? '已完成' : formatDuration(remainingDuration)}
           </p>
         </div>
-        <button
-          onClick={handleStartPause}
-          className={`mt-2 text-xs px-4 py-1 rounded ${
-            isRunning ? 'bg-red-500' : 'bg-white text-blue-500'
-          }`}
-          disabled={isCompleted}>
-          {isCompleted ? '完成' : isRunning ? '暂停' : '开始'}
-        </button>
+        <div className="flex space-x-2">
+          {/* 如果任务未完成且未开始或已暂停，则显示「开始」按钮 */}
+          {!isCompleted && !isRunning && (
+            <button
+              onClick={handleStart}
+              className="mt-2 text-xs px-4 py-1 rounded bg-white text-blue-500"
+              disabled={isCompleted}>
+              开始
+            </button>
+          )}
+
+          {/* 如果任务在进行中且未完成，则显示「暂停」按钮 */}
+          {!isCompleted && isRunning && (
+            <button
+              onClick={handlePause}
+              className="mt-2 text-xs px-4 py-1 rounded bg-yellow-500 text-white"
+              disabled={isCompleted}>
+              暂停
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
