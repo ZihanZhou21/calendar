@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  experimental: {
+    optimizeCss: true, // 确保开启优化CSS
+  },
+}
 
-export default nextConfig;
+export default nextConfig
