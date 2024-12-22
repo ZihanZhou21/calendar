@@ -63,47 +63,60 @@ const DailyTaskCard: React.FC<DailyTaskCardProps> = ({
     }
   }
 
+  // 根据不同状态改变背景色
+  // 已完成：浅灰背景
+  // 进行中：浅绿背景
+  // 暂停或未开始：浅蓝背景
   const backgroundColor = isCompleted
-    ? 'bg-yellow-300'
+    ? 'bg-[#FFEEA9]'
     : isRunning
-    ? 'bg-green-500'
-    : 'bg-blue-500'
+    ? 'bg-green-100'
+    : 'bg-blue-100'
 
   return (
     <div
-      className={`border p-4 rounded-lg shadow-sm text-white ${backgroundColor}`}>
-      <h2 className="text-lg font-semibold truncate">{title}</h2>
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="text-sm">
-            每日分配时长: {formatDuration(dailyDuration)}
-          </p>
-          <p className="text-sm">
-            剩余时长:{' '}
-            {isCompleted ? '已完成' : formatDuration(remainingDuration)}
-          </p>
-        </div>
-        <div className="flex space-x-2">
-          {/* 如果任务未完成且未开始或已暂停，则显示「开始」按钮 */}
-          {!isCompleted && !isRunning && (
-            <button
-              onClick={handleStart}
-              className="mt-2 text-xs px-4 py-1 rounded bg-white text-blue-500"
-              disabled={isCompleted}>
-              开始
-            </button>
+      className={`border p-6 rounded-lg shadow-md transition-colors duration-300 ${backgroundColor}`}>
+      <h2 className="text-xl font-bold mb-4 truncate text-[#FF7D29]">
+        {title}
+      </h2>
+      <div className="space-y-2">
+        <p className="text-sm text-gray-700">
+          每日分配时长:{' '}
+          <span className="font-semibold text-gray-900">
+            {formatDuration(dailyDuration)}
+          </span>
+        </p>
+        <p className="text-sm text-yellow-700">
+          剩余时长:{' '}
+          {isCompleted ? (
+            <span className="ml-1 font-bold text-green-600 text-lg">
+              已完成
+            </span>
+          ) : (
+            <span className="ml-1 text-3xl font-extrabold text-red-600">
+              {formatDuration(remainingDuration)}
+            </span>
           )}
+        </p>
+      </div>
+      <div className="flex space-x-4 mt-6">
+        {!isCompleted && !isRunning && (
+          <button
+            onClick={handleStart}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded"
+            disabled={isCompleted}>
+            开始
+          </button>
+        )}
 
-          {/* 如果任务在进行中且未完成，则显示「暂停」按钮 */}
-          {!isCompleted && isRunning && (
-            <button
-              onClick={handlePause}
-              className="mt-2 text-xs px-4 py-1 rounded bg-yellow-500 text-white"
-              disabled={isCompleted}>
-              暂停
-            </button>
-          )}
-        </div>
+        {!isCompleted && isRunning && (
+          <button
+            onClick={handlePause}
+            className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 rounded"
+            disabled={isCompleted}>
+            暂停
+          </button>
+        )}
       </div>
     </div>
   )
