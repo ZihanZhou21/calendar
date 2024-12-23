@@ -12,7 +12,7 @@ interface HeaderContentProps {
 export default function HeaderContent({ email }: HeaderContentProps) {
   const menuItems = [
     { path: '/task', label: 'task' },
-    { path: '/about', label: 'About' },
+    { path: '/dashboard', label: 'dashboard' },
     { path: '/pricing', label: 'Pricing' },
   ]
 
@@ -35,7 +35,7 @@ export default function HeaderContent({ email }: HeaderContentProps) {
         ))}
         {email ? (
           <>
-            <Link href="/dashboard">{email}</Link>
+            {email}
             <a href="/api/logout">Logout</a>
           </>
         ) : (
@@ -58,7 +58,7 @@ export default function HeaderContent({ email }: HeaderContentProps) {
           className="ml-auto">
           {email ? (
             <>
-              <Dropdown.Item href="/dashboard">{email}</Dropdown.Item>
+              <Dropdown.Item>{email}</Dropdown.Item>
               <Dropdown.Divider />
               {menuItems.map((item, index) => (
                 <Dropdown.Item key={index} href={item.path}>
