@@ -276,7 +276,7 @@ export default function TaskManagementPage() {
       <button
         onClick={() => setShowForm(true)}
         className="mb-4 px-4 py-2 bg-blue-500 text-white rounded">
-        创建任务
+        Create Task
       </button>
       {showForm && (
         <TaskForm
@@ -296,7 +296,7 @@ export default function TaskManagementPage() {
 
       {/* 任务列表 */}
       <div>
-        <h2 className="text-xl font-bold mb-2">任务列表</h2>
+        <h2 className="text-xl font-bold mb-2">Task List</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {tasks.map((task) => (
             <TaskCard
@@ -314,7 +314,7 @@ export default function TaskManagementPage() {
 
       {/* 每日任务列表 */}
       <div>
-        <h2 className="text-xl font-bold mt-6 mb-2">每日任务列表</h2>
+        <h2 className="text-xl font-bold mt-6 mb-2">Daily Task</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {dailyTasks.map((dailyTask) => (
             <DailyTaskCard

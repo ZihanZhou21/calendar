@@ -1,10 +1,9 @@
 import { Task } from '@type/task'
 import { formatDuration } from '@/utils/formatDuration'
-import { FaEdit, FaTrash } from 'react-icons/fa' // 引入图标组件
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faPenToSquare,
-  faCoffee,
   faTrash,
   faEdit,
 } from '@fortawesome/free-solid-svg-icons'
@@ -31,8 +30,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete, onEdit }) => {
           <button
             onClick={onEdit}
             className="text-blue-600 hover:text-blue-800"
-            aria-label="编辑任务"
-            title="编辑任务">
+            aria-label="Edit"
+            title="Edit Task">
             {/* <FaEdit className="w-5 h-5" /> */}
             <FontAwesomeIcon icon={faPenToSquare} />
           </button>
@@ -40,8 +39,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete, onEdit }) => {
         <button
           onClick={onDelete}
           className="text-red-600 hover:text-red-800"
-          aria-label="删除任务"
-          title="删除任务">
+          aria-label="Delete"
+          title="Delete">
           <FontAwesomeIcon icon={faTrash} />
         </button>
       </div>
@@ -54,16 +53,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete, onEdit }) => {
       {/* 任务时长信息 */}
       <div className="space-y-2">
         <p className="text-sm text-gray-700">
-          总时长:{' '}
+          Total Duration:{' '}
           <span className="font-semibold text-gray-900">
             {formatDuration(totalDuration)}
           </span>
         </p>
         <p className="text-sm text-gray-700">
-          剩余时长:{' '}
+          Duration:{' '}
           {isCompleted ? (
             <span className="ml-1 font-bold text-green-600 text-lg">
-              已完成
+              Completed
             </span>
           ) : (
             <span className="ml-1 text-3xl font-extrabold text-red-600">
