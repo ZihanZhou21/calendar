@@ -271,7 +271,7 @@ export default function TaskManagementPage() {
     }
   }
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 bg-purple-50">
       {error && <p className="text-red-500">{error}</p>}
       <button
         onClick={() => setShowForm(true)}

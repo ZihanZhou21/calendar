@@ -88,7 +88,7 @@ export default function EventTypesPage() {
   }
 
   return (
-    <div className="bg-green-200 flex-col">
+    <div className="bg-purple-100 flex-col">
       <DashboardNav />
       <CalendarComponent
         events={data.data}

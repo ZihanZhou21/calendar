@@ -17,7 +17,7 @@ export default function HeaderContent({ email }: HeaderContentProps) {
   ]
 
   return (
-    <header className="bg-green-200 flex justify-between items-center p-4 text-gray-600 font-light">
+    <header className="bg-purple-100 flex justify-between items-center p-4 text-gray-600 font-light">
       {/* Left side with logo */}
       <Link
         href="/"
