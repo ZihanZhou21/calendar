@@ -15,7 +15,7 @@ interface TaskCardProps {
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete, onEdit }) => {
-  const { title, totalDuration, remainingDuration } = task
+  const { title, totalDuration, remainingDuration, remainingDays } = task
   const isCompleted = remainingDuration === 0
 
   // 根据是否完成改变背景
@@ -52,6 +52,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete, onEdit }) => {
 
       {/* 任务时长信息 */}
       <div className="space-y-2">
+        <p className="text-sm text-gray-700">
+          remainingDays:{' '}
+          <span className="font-semibold text-gray-900">{remainingDays}</span>
+        </p>
         <p className="text-sm text-gray-700">
           Total Duration:{' '}
           <span className="font-semibold text-gray-900">

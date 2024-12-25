@@ -16,7 +16,7 @@ export default function TaskManagementPage() {
 
   const taskApi = '/api/tasks'
   const dailyTaskApi = '/api/daily-tasks'
-
+  const resetDailyTaskApi = '/api/reset-daily-tasks'
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -270,6 +270,22 @@ export default function TaskManagementPage() {
       setError('请求过程中出现错误，请稍后重试。')
     }
   }
+
+  const resetDailyTasks = async () => {
+    try {
+      const response = await fetch(resetDailyTaskApi, { method: 'POST' })
+      if (response.ok) {
+        setDailyTasks((prev) =>
+          prev.map((dailyTask) => ({ ...dailyTask, isCompleted: false }))
+        )
+      } else {
+        setError('重置每日任务失败，请稍后重试。')
+      }
+    } catch {
+      setError('重置每日任务失败，请稍后重试。')
+    }
+  }
+
   return (
     <div className="container mx-auto p-4 bg-purple-50">
       {error && <p className="text-red-500">{error}</p>}

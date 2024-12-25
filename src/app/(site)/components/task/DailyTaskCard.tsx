@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { DailyTask } from '@type/task'
 import { formatDuration } from '@/utils/formatDuration'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPause, faPlay } from '@fortawesome/free-solid-svg-icons'
 
 interface DailyTaskCardProps {
   task: DailyTask
@@ -105,7 +107,7 @@ const DailyTaskCard: React.FC<DailyTaskCardProps> = ({
             onClick={handleStart}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded"
             disabled={isCompleted}>
-            Start
+            <FontAwesomeIcon icon={faPlay} />
           </button>
         )}
 
@@ -114,7 +116,7 @@ const DailyTaskCard: React.FC<DailyTaskCardProps> = ({
             onClick={handlePause}
             className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 rounded"
             disabled={isCompleted}>
-            Pause
+            <FontAwesomeIcon icon={faPause} />
           </button>
         )}
       </div>
