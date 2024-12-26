@@ -373,7 +373,7 @@ export default function TaskManagementPage() {
         {tasks.length === 0 ? (
           <p>No Task</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid h-auto grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2">
             {tasks.map((task) => (
               <TaskCard
                 key={task._id}
@@ -383,6 +383,7 @@ export default function TaskManagementPage() {
                   setEditingTask(task)
                   setShowForm(true)
                 }}
+                // Add this to allow content to determine height
               />
             ))}
           </div>
@@ -395,7 +396,7 @@ export default function TaskManagementPage() {
         {dailyTasks.length === 0 ? (
           <p>No Daily Task</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2">
             {dailyTasks.map((dailyTask) => (
               <DailyTaskCard
                 key={dailyTask._id}
