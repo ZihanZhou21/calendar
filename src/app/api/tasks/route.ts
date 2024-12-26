@@ -11,7 +11,8 @@ export async function POST(req: NextRequest) {
 
     // Step 1: 获取当前日期作为任务开始日期
     const startDate = new Date()
-
+    const endDate = new Date(startDate)
+    endDate.setDate(endDate.getDate() + totalDays)
     // Step 2: 创建任务
     const newTask = await Task.create({
       title,
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
       totalDays,
       remainingDuration: totalDuration, // 初始化剩余总时长
       startDate, // 设置开始日期
+      endDate,
       remainingDays: totalDays, // 剩余天数初始化为总天数
     })
 
@@ -32,6 +34,7 @@ export async function POST(req: NextRequest) {
       dailyDuration,
       remainingDuration: dailyDuration,
       isCompleted: false,
+      currentDate: startDate, // 设置当前日期为开始日期
     })
 
     // Step 5: 返回任务和每日任务数据

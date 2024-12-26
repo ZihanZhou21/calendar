@@ -7,6 +7,7 @@ export interface ITask extends Document {
   remainingDuration: number // 剩余时长（秒）
   remainingDays: number // 剩余天数
   startDate: Date // 开始日期
+  endDate: Date // 开始日期
 }
 
 const TaskSchema = new Schema<ITask>({
@@ -16,6 +17,7 @@ const TaskSchema = new Schema<ITask>({
   remainingDuration: { type: Number, required: true },
   remainingDays: { type: Number },
   startDate: { type: Date, required: true },
+  endDate: { type: Date, required: true },
 })
 
 export default mongoose.models.Task || model<ITask>('Task', TaskSchema)

@@ -6,6 +6,7 @@ export interface IDailyTask extends Document {
   dailyDuration: number // 每日分配的时长（秒）
   remainingDuration: number // 剩余时长（秒）
   isCompleted: boolean // 是否完成
+  currentDate: Date // 当前日期
   // remainingDays: number // 剩余天数
 }
 
@@ -17,6 +18,7 @@ const DailyTaskSchema = new mongoose.Schema({
   dailyDuration: { type: Number, required: true },
   remainingDuration: { type: Number, required: true },
   isCompleted: { type: Boolean, default: false },
+  currentDate: { type: Date, required: true },
 })
 
 export default mongoose.models.DailyTask ||
