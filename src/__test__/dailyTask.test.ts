@@ -42,9 +42,11 @@ describe('DailyTask Update API', () => {
     global.Date = class extends Date {
       constructor(date?: any) {
         if (date) {
-          return super(date)
+          super(date)
+          return this
         }
-        return new realDate(nextDay)
+        super(nextDay)
+        return this
       }
       static now() {
         return nextDay.getTime()
