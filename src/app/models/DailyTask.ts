@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, model } from 'mongoose'
+import { start } from 'repl'
 
 export interface IDailyTask extends Document {
   taskId: mongoose.Types.ObjectId // 关联的任务 ID
@@ -7,6 +8,7 @@ export interface IDailyTask extends Document {
   remainingDuration: number // 剩余时长（秒）
   isCompleted: boolean // 是否完成
   currentDate: Date // 当前日期
+  startDate: Date // 开始日期
   // remainingDays: number // 剩余天数
 }
 
@@ -19,6 +21,7 @@ const DailyTaskSchema = new mongoose.Schema({
   remainingDuration: { type: Number, required: true },
   isCompleted: { type: Boolean, default: false },
   currentDate: { type: Date, required: true },
+  startDate: { type: Date, default: Date.now },
 })
 
 export default mongoose.models.DailyTask ||

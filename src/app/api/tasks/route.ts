@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
       taskId: newTask._id, // 与任务关联
       title: `${title} - Day 1`,
       dailyDuration,
+      startDate,
       remainingDuration: dailyDuration,
       isCompleted: false,
       currentDate: startDate, // 设置当前日期为开始日期

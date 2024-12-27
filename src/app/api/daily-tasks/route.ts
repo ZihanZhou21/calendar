@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
       dailyDuration,
       remainingDuration: dailyDuration,
       isCompleted: false,
+      startDate: task.startDate,
     })
 
     // Step 5: 返回生成的每日任务

@@ -18,6 +18,7 @@ export interface DailyTask {
   remainingDuration: number // 每日剩余时长（以秒为单位）
   isCompleted: boolean // 是否完成
   currentDate: string // 当前日期（ISO 格式字符串）
+  startDate: string // 每日任务开始日期（ISO 格式字符串）
   // remainingDays: number // 剩余天数
 }
 // src/types/task.ts

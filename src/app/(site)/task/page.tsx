@@ -58,30 +58,30 @@ export default function TaskManagementPage() {
   }, [])
 
   // --------------------- 定义更新按钮的处理函数 ------------------------
-  const handleResetDailyTasks = async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch(resetDailyTaskApi, {
-        method: 'POST',
-      })
-      if (!response.ok) {
-        throw new Error('Failed to reset daily tasks.')
-      }
-      const data = await response.json()
-      if (data.success) {
-        console.log('Daily tasks updated:', data.message)
-        // 刷新页面数据
-        router.refresh()
-      } else {
-        throw new Error(data.error || 'Unknown error')
-      }
-    } catch (err: any) {
-      console.error(err)
-      setError('更新每日任务失败，请稍后重试。')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  // const handleResetDailyTasks = async () => {
+  //   try {
+  //     setIsLoading(true)
+  //     const response = await fetch(resetDailyTaskApi, {
+  //       method: 'POST',
+  //     })
+  //     if (!response.ok) {
+  //       throw new Error('Failed to reset daily tasks.')
+  //     }
+  //     const data = await response.json()
+  //     if (data.success) {
+  //       console.log('Daily tasks updated:', data.message)
+  //       // 刷新页面数据
+  //       router.refresh()
+  //     } else {
+  //       throw new Error(data.error || 'Unknown error')
+  //     }
+  //   } catch (err: any) {
+  //     console.error(err)
+  //     setError('更新每日任务失败，请稍后重试。')
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
 
   // --------------------- 任务相关函数 ------------------------
   const createTask = async (
@@ -311,6 +311,8 @@ export default function TaskManagementPage() {
       const response = await fetch(resetDailyTaskApi, { method: 'POST' })
       if (response.ok) {
         // 刷新页面以显示最新数据
+        fetchTasks()
+        fetchDailyTasks()
         router.refresh()
       } else {
         setError('重置每日任务失败，请稍后重试。')
@@ -334,7 +336,7 @@ export default function TaskManagementPage() {
         </button>
         {/* 更新每日任务按钮 */}
         <button
-          onClick={handleResetDailyTasks}
+          onClick={resetDailyTasks}
           disabled={isLoading}
           className={`mb-6 px-4 py-2 rounded ${
             isLoading
