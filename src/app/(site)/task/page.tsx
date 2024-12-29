@@ -306,19 +306,30 @@ export default function TaskManagementPage() {
   }
 
   // --------------------- 重置每日任务的函数 ------------------------
-  const resetDailyTasks = async () => {
+  const handleResetDailyTasks = async () => {
     try {
+      console.log('123123123123')
+      setIsLoading(true)
       const response = await fetch(resetDailyTaskApi, { method: 'POST' })
-      if (response.ok) {
-        // 刷新页面以显示最新数据
-        fetchTasks()
-        fetchDailyTasks()
-        router.refresh()
+      if (!response.ok) throw new Error('Failed to reset daily tasks.')
+
+      const data = await response.json()
+      if (data.success) {
+        console.log('Daily tasks updated:', data.message)
+        // 方式1: 显式调用前端函数再次获取 dailyTasks
+        await fetchTasks()
+
+        await fetchDailyTasks()
+        // 方式2: 也可再 router.refresh()，若服务端组件在 SSR 中拉取 tasks/dailytasks
+        console.log(dailyTasks, tasks)
       } else {
-        setError('重置每日任务失败，请稍后重试。')
+        throw new Error(data.error || 'Unknown error')
       }
-    } catch {
-      setError('重置每日任务失败，请稍后重试。')
+    } catch (err: any) {
+      console.error(err)
+      setError('更新每日任务失败，请稍后重试。')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -336,7 +347,7 @@ export default function TaskManagementPage() {
         </button>
         {/* 更新每日任务按钮 */}
         <button
-          onClick={resetDailyTasks}
+          onClick={handleResetDailyTasks}
           disabled={isLoading}
           className={`mb-6 px-4 py-2 rounded ${
             isLoading
