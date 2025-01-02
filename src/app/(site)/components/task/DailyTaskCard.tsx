@@ -24,7 +24,7 @@ const DailyTaskCard: React.FC<DailyTaskCardProps> = ({
   const [isRunning, setIsRunning] = useState<boolean>(false)
 
   useEffect(() => {
-    let timer: NodeJS.Timeout
+    let timer: NodeJS.Timer
 
     const handleComplete = async () => {
       try {

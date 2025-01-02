@@ -40,7 +40,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
 
   // 如果 isActive = true 且 timeLeft > 0，则每秒减少1
   useEffect(() => {
-    let timer: NodeJS.Timeout | null = null
+    let timer: ReturnType<typeof setInterval> | null = null
     if (isActive && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft((prev) => prev - 1)
