@@ -7,6 +7,8 @@ import Header from './components/Header'
 import { SWRConfig } from 'swr'
 import { fetcher } from '../utils/fetcher'
 import SWRProvider from './components/SWRProvider'
+import { TimerProvider } from './Context/TimerContext'
+
 const noto = Noto_Sans({ subsets: ['latin'], weight: ['300', '400', '700'] })
 
 export const metadata: Metadata = {
@@ -25,7 +27,7 @@ export default function RootLayout({
         <SWRProvider>
           <main className="container ">
             <Header />
-            {children}
+            <TimerProvider>{children}</TimerProvider>
           </main>
         </SWRProvider>
       </body>

@@ -3,6 +3,7 @@ import { DailyTask } from '@type/task'
 import { formatDuration } from '@/utils/formatDuration'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPause, faPlay } from '@fortawesome/free-solid-svg-icons'
+import { useTimer } from '../../Context/TimerContext' // 根据你的实际路径来
 
 interface DailyTaskCardProps {
   task: DailyTask
