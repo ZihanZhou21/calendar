@@ -9,6 +9,7 @@ export default function TimerPage() {
 
   // 用于“快捷按钮”或手动输入 -> 统一存到 localMinutes
   const [localMinutes, setLocalMinutes] = useState(0)
+  const [tempMinutes, setTempMinutes] = useState(0)
 
   // 格式化秒数为 mm:ss
   function formatTime(seconds: number) {
@@ -49,7 +50,7 @@ export default function TimerPage() {
       <h1 className="text-xl font-bold">Global Timer</h1>
 
       {/* 显示当前计时器或静态预览 */}
-      <div className="text-3xl font-semibold">{renderTimerDisplay()}</div>
+      <div className="text-8xl font-semibold">{renderTimerDisplay()}</div>
 
       {/* 手动输入框 + “设置” 按钮（可选） */}
       <div className="flex items-center gap-2">
@@ -57,19 +58,16 @@ export default function TimerPage() {
           type="number"
           min={0}
           className="border px-2 py-1 w-24 text-center"
-          // 绑定到 localMinutes
-          value={localMinutes}
-          onChange={(e) => setLocalMinutes(Number(e.target.value))}
+          value={tempMinutes} // 由 tempMinutes 控制
+          onChange={(e) => setTempMinutes(Number(e.target.value))}
         />
-        {/* 这里不是立刻 startTimer，而是仅更新 localMinutes */}
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded"
           onClick={() => {
-            // 这个按钮可以改成 “Set” 或留空，
-            // 如果你想手动输入后直接开始倒计时，可以在这里调用 startTimer(localMinutes)
-            // 也可以干脆删除这个按钮让用户只用 "Start"
+            // 只有此时才把tempMinutes赋给localMinutes
+            setLocalMinutes(tempMinutes)
           }}>
-          Set (Optional)
+          Set
         </button>
       </div>
 
