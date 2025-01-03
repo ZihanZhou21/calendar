@@ -1,128 +1,105 @@
-import { useState, useEffect } from 'react'
+// DailyTaskCard.tsx
+'use client'
+
+import React, { useEffect, useState } from 'react'
 import { DailyTask } from '@type/task'
 import { formatDuration } from '@/utils/formatDuration'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPause, faPlay } from '@fortawesome/free-solid-svg-icons'
-import { useTimer } from '../../Context/TimerContext' // 根据你的实际路径来
+import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons'
+import { useLocalTimer } from '../localTimer/localtimer'
 
 interface DailyTaskCardProps {
   task: DailyTask
-  onComplete: (taskId: string, remainingDuration: number) => Promise<void>
-  onPause?: (taskId: string, remainingDuration: number) => Promise<void>
+  onComplete?: (taskId: string, remaining: number) => void
+  onPause?: (taskId: string, remaining: number) => void
 }
 
-const DailyTaskCard: React.FC<DailyTaskCardProps> = ({
+export default function DailyTaskCard({
   task,
   onComplete,
   onPause,
-}) => {
-  const { title, dailyDuration, remainingDuration: initialRemaining } = task
+}: DailyTaskCardProps) {
+  const {
+    _id,
+    title,
+    dailyDuration,
+    remainingDuration: initialRemaining,
+  } = task
 
-  const [remainingDuration, setRemainingDuration] =
-    useState<number>(initialRemaining)
-  const [isCompleted, setIsCompleted] = useState<boolean>(false)
-  const [isRunning, setIsRunning] = useState<boolean>(false)
+  // 使用自定义 Hook，传入初始秒数
+  const { timeLeft, isActive, startTimer, pauseTimer, resumeTimer } =
+    useLocalTimer(_id, initialRemaining)
+
+  const [isCompleted, setIsCompleted] = useState(false)
 
   useEffect(() => {
-    let timer: NodeJS.Timer
-
-    const handleComplete = async () => {
-      try {
-        await onComplete(task._id, remainingDuration)
-      } catch (error) {
-        console.error('标记任务完成失败:', error)
-      }
-    }
-
-    if (isRunning && remainingDuration > 0) {
-      timer = setInterval(() => {
-        setRemainingDuration((prev) => prev - 1)
-      }, 1000)
-    }
-
-    if (remainingDuration === 0 && !isCompleted) {
-      setIsRunning(false)
+    // timeLeft=0 && !isActive => 任务完成
+    if (!isCompleted && timeLeft === 0 && !isActive) {
       setIsCompleted(true)
-      handleComplete()
+      onComplete?.(_id, 0)
     }
-
-    return () => clearInterval(timer)
-  }, [isRunning, remainingDuration, isCompleted, onComplete, task._id])
+  }, [timeLeft, isActive, isCompleted, onComplete, _id])
 
   const handleStart = () => {
-    if (!isCompleted && remainingDuration > 0) {
-      setIsRunning(true)
+    if (!isCompleted && initialRemaining > 0) {
+      // 若 timeLeft>0 且想再次开始，可根据需求调 startTimer(...)
+      startTimer(timeLeft || initialRemaining)
     }
   }
 
-  const handlePause = async () => {
-    setIsRunning(false)
-    if (onPause) {
-      try {
-        await onPause(task._id, remainingDuration)
-      } catch (error) {
-        console.error('暂停每日任务失败:', error)
-      }
-    }
+  const handlePause = () => {
+    pauseTimer()
+    onPause?.(_id, timeLeft)
   }
-
-  // 根据不同状态改变背景色
-  // 已完成：浅灰背景
-  // 进行中：浅绿背景
-  // 暂停或未开始：浅蓝背景
-  const backgroundColor = isCompleted
-    ? 'bg-[#FFEEA9]'
-    : isRunning
-    ? 'bg-green-100'
-    : 'bg-blue-100'
 
   return (
-    <div
-      className={`border p-6 rounded-lg shadow-md transition-colors duration-300 ${backgroundColor}`}>
-      <h2 className="text-xl font-bold mb-4 truncate text-[#FF7D29]">
-        {title}
-      </h2>
-      <div className="space-y-2">
-        <p className="text-sm text-gray-700">
-          Daily Duration:{' '}
-          <span className="font-semibold text-gray-900">
-            {formatDuration(dailyDuration)}
-          </span>
-        </p>
-        <p className="text-sm text-yellow-700">
-          Duration:{' '}
-          {isCompleted ? (
-            <span className="ml-1 font-bold text-green-600 text-lg">
-              Completed
-            </span>
-          ) : (
-            <span className="ml-1 text-3xl font-extrabold text-red-600">
-              {formatDuration(remainingDuration)}
-            </span>
-          )}
-        </p>
-      </div>
-      <div className="flex space-x-4 mt-6">
-        {!isCompleted && !isRunning && (
-          <button
-            onClick={handleStart}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded"
-            disabled={isCompleted}>
-            <FontAwesomeIcon icon={faPlay} />
-          </button>
-        )}
+    <div className="border p-4 rounded shadow-sm bg-white">
+      <h3 className="text-lg font-bold mb-2">{title}</h3>
 
-        {!isCompleted && isRunning && (
-          <button
-            onClick={handlePause}
-            className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 rounded"
-            disabled={isCompleted}>
-            <FontAwesomeIcon icon={faPause} />
-          </button>
+      <p className="text-sm">Daily Duration: {formatDuration(dailyDuration)}</p>
+      <p className="text-sm">
+        Remaining:{' '}
+        {isCompleted ? (
+          <span className="text-green-600 font-bold">Completed</span>
+        ) : (
+          <span className="text-red-600 font-bold text-xl">
+            {formatDuration(timeLeft)}
+          </span>
         )}
-      </div>
+      </p>
+
+      {!isCompleted && (
+        <div className="flex gap-2 mt-2">
+          {/* Start 按钮：timeLeft=0 时可以开始 */}
+          {!isActive && timeLeft === 0 && (
+            <button
+              className="px-3 py-1 rounded bg-blue-600 text-white"
+              onClick={handleStart}>
+              <FontAwesomeIcon icon={faPlay} /> Start
+            </button>
+          )}
+
+          {/* Pause 按钮：计时中才能暂停 */}
+          {isActive && (
+            <button
+              className="px-3 py-1 rounded bg-yellow-500 text-white"
+              onClick={handlePause}>
+              <FontAwesomeIcon icon={faPause} /> Pause
+            </button>
+          )}
+
+          {/* Resume 按钮：暂停且 timeLeft>0 时才能恢复 */}
+          {!isActive && timeLeft > 0 && (
+            <button
+              className="px-3 py-1 rounded bg-green-500 text-white"
+              onClick={() => resumeTimer()}>
+              <FontAwesomeIcon icon={faPlay} /> Resume
+            </button>
+          )}
+
+          {/* Stop 按钮已被删除 */}
+        </div>
+      )}
     </div>
   )
 }
-
-export default DailyTaskCard
