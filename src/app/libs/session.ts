@@ -15,7 +15,8 @@ import { SessionOptions } from 'iron-session'
 
 export const sessionOptions: SessionOptions = {
   cookieName: 'calendix_session',
-  password: process.env.SECRET, // 至少32个字符的复杂密码
+  password:
+    process.env.SECRET || 'complex_password_at_least_32_characters_long', // 至少32个字符的复杂密码
   cookieOptions: {
     secure: true, // 仅在生产环境中使用 secure
   },

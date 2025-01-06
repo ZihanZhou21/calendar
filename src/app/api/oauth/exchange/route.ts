@@ -1,15 +1,16 @@
 import { nylas, nylasConfig } from '../../../libs/nylas'
-import { NextApiRequest } from 'next'
+// import { NextApiRequest } from 'next'
 import { sessionOptions } from '../../../libs/session'
 import { redirect } from 'next/navigation'
 import { getIronSession } from 'iron-session'
 
 import { cookies } from 'next/headers'
+import { NextRequest } from 'next/server'
 type SessionData = {
   grantId?: string
   email?: string
 }
-export async function GET(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   console.log('Received callback from Nylas')
   // const code = req.query.code
   if (!req.url) {

@@ -40,7 +40,7 @@ export function useLocalTimer(taskId: string, defaultSeconds: number) {
 
   // 2. 每秒倒计时
   useEffect(() => {
-    let timer: NodeJS.Timeout | null = null
+    let timer: ReturnType<typeof setInterval> | null = null
     if (isActive && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft((prev) => prev - 1)

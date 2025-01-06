@@ -56,12 +56,13 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { dailyTaskId: string } }
+  context: { params: Promise<{ dailyTaskId: string }> }
 ) {
   await dbConnect()
 
   try {
-    const { dailyTaskId } = params
+    const { params } = context
+    const dailyTaskId = (await params).dailyTaskId
     const deletedDailyTask = await DailyTask.findByIdAndDelete(dailyTaskId)
 
     if (!deletedDailyTask) {
