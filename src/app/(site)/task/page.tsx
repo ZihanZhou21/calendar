@@ -342,14 +342,14 @@ export default function TaskManagementPage() {
         {' '}
         <button
           onClick={() => setShowForm(true)}
-          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded-2xl hover:bg-blue-600">
           create task
         </button>
         {/* 更新每日任务按钮 */}
         <button
           onClick={handleResetDailyTasks}
           disabled={isLoading}
-          className={`mb-6 px-4 py-2 rounded ${
+          className={`mb-6 px-4 py-2 rounded-xl ${
             isLoading
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-green-600 hover:bg-green-700 text-white'
@@ -386,7 +386,7 @@ export default function TaskManagementPage() {
         {tasks.length === 0 ? (
           <p>No Task</p>
         ) : (
-          <div className="grid h-auto grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2">
+          <div className="grid h-auto grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
             {tasks.map((task) => (
               <TaskCard
                 key={task._id}
@@ -409,7 +409,7 @@ export default function TaskManagementPage() {
         {dailyTasks.length === 0 ? (
           <p>No Daily Task</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
             {dailyTasks.map((dailyTask) => (
               <DailyTaskCard
                 key={dailyTask._id}

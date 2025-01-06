@@ -26,41 +26,95 @@ export default function DailyTaskCard({
     remainingDuration: initialRemaining,
   } = task
 
-  // 使用自定义 Hook，传入初始秒数
+  // 自定义 Hook：以初始秒数（initialRemaining）启动/恢复本地倒计时
   const { timeLeft, isActive, startTimer, pauseTimer, resumeTimer } =
     useLocalTimer(_id, initialRemaining)
 
+  // 是否已完成标识
   const [isCompleted, setIsCompleted] = useState(false)
 
+  // 监控 timeLeft 与 isActive，当 timeLeft=0 且不在计时时，视为“已完成”
   useEffect(() => {
-    // timeLeft=0 && !isActive => 任务完成
     if (!isCompleted && timeLeft === 0 && !isActive) {
       setIsCompleted(true)
       onComplete?.(_id, 0)
     }
   }, [timeLeft, isActive, isCompleted, onComplete, _id])
 
+  // 根据任务状态动态切换背景色
+  // - 默认/暂停 → 蓝色 (bg-blue-100)
+  // - 进行中 → 淡绿色 (bg-green-100)
+  // - 已完成 → 金黄色 (bg-yellow-200)
+  let containerColor = 'bg-blue-100'
+  if (isCompleted) {
+    containerColor = 'bg-yellow-200'
+  } else if (isActive) {
+    containerColor = 'bg-green-100'
+  }
+
+  // 点击开始
   const handleStart = () => {
     if (!isCompleted && initialRemaining > 0) {
-      // 若 timeLeft>0 且想再次开始，可根据需求调 startTimer(...)
+      // 如果当前 timeLeft>0，可以传 timeLeft；否则传 initialRemaining
       startTimer(timeLeft || initialRemaining)
     }
   }
 
+  // 点击暂停
   const handlePause = () => {
     pauseTimer()
     onPause?.(_id, timeLeft)
   }
 
+  // 根据按钮不同场景渲染
+  const renderButtons = () => {
+    if (isCompleted) return null // 已完成不显示任何按钮
+
+    // 未开始或走到 0 → Start
+    if (!isActive && timeLeft === initialRemaining) {
+      return (
+        <button
+          className="px-3 py-1 rounded bg-blue-600 text-white"
+          onClick={handleStart}>
+          <FontAwesomeIcon icon={faPlay} /> Start
+        </button>
+      )
+    }
+
+    // 正在进行中 → Pause
+    if (isActive) {
+      return (
+        <button
+          className="px-3 py-1 rounded bg-yellow-500 text-white"
+          onClick={handlePause}>
+          <FontAwesomeIcon icon={faPause} /> Pause
+        </button>
+      )
+    }
+
+    // 暂停且剩余时间>0 → Resume
+    if (!isActive && timeLeft > 0) {
+      return (
+        <button
+          className="px-3 py-1 rounded bg-green-500 text-white"
+          onClick={() => resumeTimer()}>
+          <FontAwesomeIcon icon={faPlay} /> Resume
+        </button>
+      )
+    }
+
+    return null // 其他情况不显示
+  }
+
   return (
-    <div className="border p-4 rounded shadow-sm bg-white">
+    <div className={`border p-4 rounded-3xl shadow-sm ${containerColor}`}>
       <h3 className="text-lg font-bold mb-2">{title}</h3>
 
       <p className="text-sm">Daily Duration: {formatDuration(dailyDuration)}</p>
       <p className="text-sm">
         Remaining:{' '}
         {isCompleted ? (
-          <span className="text-green-600 font-bold">Completed</span>
+          <span className="text-green-800 font-bold">Completed</span>
         ) : (
           <span className="text-red-600 font-bold text-xl">
             {formatDuration(timeLeft)}
@@ -68,38 +122,7 @@ export default function DailyTaskCard({
         )}
       </p>
 
-      {!isCompleted && (
-        <div className="flex gap-2 mt-2">
-          {/* Start 按钮：timeLeft=0 时可以开始 */}
-          {!isActive && timeLeft === 0 && (
-            <button
-              className="px-3 py-1 rounded bg-blue-600 text-white"
-              onClick={handleStart}>
-              <FontAwesomeIcon icon={faPlay} /> Start
-            </button>
-          )}
-
-          {/* Pause 按钮：计时中才能暂停 */}
-          {isActive && (
-            <button
-              className="px-3 py-1 rounded bg-yellow-500 text-white"
-              onClick={handlePause}>
-              <FontAwesomeIcon icon={faPause} /> Pause
-            </button>
-          )}
-
-          {/* Resume 按钮：暂停且 timeLeft>0 时才能恢复 */}
-          {!isActive && timeLeft > 0 && (
-            <button
-              className="px-3 py-1 rounded bg-green-500 text-white"
-              onClick={() => resumeTimer()}>
-              <FontAwesomeIcon icon={faPlay} /> Resume
-            </button>
-          )}
-
-          {/* Stop 按钮已被删除 */}
-        </div>
-      )}
+      <div className="flex gap-2 mt-2">{renderButtons()}</div>
     </div>
   )
 }

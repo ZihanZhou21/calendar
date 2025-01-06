@@ -19,11 +19,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete, onEdit }) => {
   const isCompleted = remainingDuration === 0
 
   // 根据是否完成改变背景
-  const backgroundColor = isCompleted ? 'bg-gray-100' : 'bg-purple-100'
+  const backgroundColor = isCompleted ? 'bg-[#ffd6ff]' : 'bg-[#cd88e9]'
 
   return (
     <div
-      className={`relative border p-6 rounded-lg shadow-md ${backgroundColor}`}>
+      className={`relative border p-6 rounded-3xl shadow-md ${backgroundColor}`}>
       {/* 右上角的图标按钮 */}
       <div className="absolute top-2 right-2 flex space-x-2">
         {!isCompleted && (
