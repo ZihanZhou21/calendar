@@ -334,7 +334,7 @@ export default function TaskManagementPage() {
   }
 
   return (
-    <div className="container mx-auto p-4 bg-purple-50 min-h-screen">
+    <div className="container mx-auto flex-col flex-1 bg-purple-50 ">
       <h1 className="text-3xl font-bold mb-4">Task</h1>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -386,7 +386,8 @@ export default function TaskManagementPage() {
         {tasks.length === 0 ? (
           <p>No Task</p>
         ) : (
-          <div className="grid h-auto grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
+          <div className="grid gap-4 grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))]">
+            {/* // <div className="flex gap-4 flex-wrap"> */}
             {tasks.map((task) => (
               <TaskCard
                 key={task._id}
@@ -409,7 +410,8 @@ export default function TaskManagementPage() {
         {dailyTasks.length === 0 ? (
           <p>No Daily Task</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
+          // <div className="flex gap-4 flex-wrap">
+          <div className="grid gap-4 grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))]">
             {dailyTasks.map((dailyTask) => (
               <DailyTaskCard
                 key={dailyTask._id}
