@@ -334,7 +334,7 @@ export default function TaskManagementPage() {
   }
 
   return (
-    <div className="container mx-auto flex-col flex-1 bg-purple-50 ">
+    <div className=" p-6 flex-col flex-1 bg-purple-50 ">
       <h1 className="text-3xl font-bold mb-4">Task</h1>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}

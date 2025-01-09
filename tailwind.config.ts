@@ -16,11 +16,11 @@ const config: Config = {
     fontSize,
     container: {
       center: true,
-      padding: {
-        DEFAULT: '1rem',
-        sm: '2rem',
-        lg: '4rem',
-      },
+      // padding: {
+      //   DEFAULT: '1rem',
+      //   sm: '2rem',
+      //   lg: '4rem',
+      // },
       screens: {
         sm: '640px',
         md: '728px',
@@ -30,6 +30,9 @@ const config: Config = {
       },
     },
     extend: {
+      borderRadius: {
+        '4xl': '2.5rem', // 这里的 2rem 只是示例，你可以改成任何需要的值
+      },
       screens: {
         custom: '696px',
         // ...additional custom breakpoints
