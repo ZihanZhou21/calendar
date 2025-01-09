@@ -9,6 +9,7 @@ import {
   faStop,
   faRefresh,
 } from '@fortawesome/free-solid-svg-icons'
+import { Card } from 'flowbite-react'
 export default function TimerPage() {
   const { timeLeft, isActive, startTimer, stopTimer, pauseTimer, resumeTimer } =
     useTimer()
@@ -89,14 +90,18 @@ export default function TimerPage() {
           25分钟
         </button>
       </div>
-      <div className="bg-[#1d1c1c] flex flex-col h-48 w-96 rounded-4xl items-center justify-center">
+      <Card className="bg-gradient-to-tr from-[#000000] to-[#434343] flex flex-col h-48 w-96 rounded-4xl items-center justify-center">
         <div className="text-7xl text-white  font-medium">
           {renderTimerDisplay()}
         </div>
-        <div className="flex gap-2 mt-4">
+        <div className="flex justify-center gap-4 mt-4">
           {/* 真正的开始计时：改用 localMinutes */}
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-full"
+            className="bg-blue-600 h-11 w-11 text-white px-4 py-2 rounded-full transition-all duration-200
+    hover:bg-blue-500
+    hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]
+    hover:scale-105
+    active:scale-95"
             onClick={() => {
               // 如果计时器正在运行，则暂停
               if (isActive) {
@@ -113,39 +118,28 @@ export default function TimerPage() {
               }
             }}>
             {isActive ? (
-              <FontAwesomeIcon icon={faPause} />
+              <FontAwesomeIcon className="w-full h-full" icon={faPause} />
             ) : !isActive && timeLeft > 0 ? (
-              <FontAwesomeIcon icon={faPlay} />
+              <FontAwesomeIcon className="w-full h-full" icon={faPlay} />
             ) : (
-              <FontAwesomeIcon icon={faPlay} />
+              <FontAwesomeIcon className="w-full h-full" icon={faPlay} />
             )}
           </button>
 
           <button
-            className="bg-gray-500 text-white px-4 py-2 rounded-full"
+            className="bg-gray-500 text-white h-11 w-11 px-4 py-2 rounded-full transition-all duration-200
+    hover:bg-gray-500
+    hover:shadow-[0_0_15px_rgba(107,114,128,0.5)]
+    hover:scale-105
+    active:scale-95"
             onClick={() => {
               stopTimer()
               // 如需停止后重置 localMinutes，也可以: setLocalMinutes(0);
             }}>
-            <FontAwesomeIcon icon={faStop} />
+            <FontAwesomeIcon className="w-full h-full" icon={faStop} />
           </button>
-
-          {/* 如果倒计时还没归零，就显示暂停/恢复 */}
-          {/* {timeLeft > 0 && (
-            <button
-              className="bg-purple-500 text-white px-4 py-2 rounded"
-              onClick={handlePauseResume}>
-              {isActive ? 'Pause' : 'Resume'}
-            </button>
-          )} */}
         </div>
-      </div>
-      {/* 显示当前计时器或静态预览 */}
-
-      {/* 手动输入框 + “设置” 按钮（可选） */}
-
-      {/* 快捷按钮：只更新 localMinutes，不调用 startTimer */}
-      {/* Start / Stop / Pause/Resume 控制 */}
+      </Card>
     </div>
   )
 }
