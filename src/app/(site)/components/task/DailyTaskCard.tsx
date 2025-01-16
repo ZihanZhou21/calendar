@@ -22,18 +22,20 @@ export default function DailyTaskCard({
   const {
     _id,
     title,
+    // 假设这里的 dailyDuration 就是“每日剩余”或原始剩余时间
     dailyDuration,
+    // 服务器传来的初始剩余时间
     remainingDuration: initialRemaining,
   } = task
 
-  // 自定义 Hook：以初始秒数（initialRemaining）启动/恢复本地倒计时
+  // 自定义 Hook 管理倒计时
   const { timeLeft, isActive, startTimer, pauseTimer, resumeTimer } =
     useLocalTimer(_id, initialRemaining)
 
-  // 是否已完成标识
+  // 是否已完成
   const [isCompleted, setIsCompleted] = useState(false)
 
-  // 监控 timeLeft 与 isActive，当 timeLeft=0 且不在计时时，视为“已完成”
+  // 当 timeLeft=0 且不在计时时 => 任务视为完成
   useEffect(() => {
     if (!isCompleted && timeLeft === 0 && !isActive) {
       setIsCompleted(true)
@@ -41,10 +43,7 @@ export default function DailyTaskCard({
     }
   }, [timeLeft, isActive, isCompleted, onComplete, _id])
 
-  // 根据任务状态动态切换背景色
-  // - 默认/暂停 → 蓝色 (bg-blue-100)
-  // - 进行中 → 淡绿色 (bg-green-100)
-  // - 已完成 → 金黄色 (bg-yellow-200)
+  // 根据状态决定卡片背景
   let containerColor = 'bg-blue-100'
   if (isCompleted) {
     containerColor = 'bg-yellow-200'
@@ -52,26 +51,32 @@ export default function DailyTaskCard({
     containerColor = 'bg-green-100'
   }
 
-  // 点击开始
+  // 开始
   const handleStart = () => {
     if (!isCompleted && initialRemaining > 0) {
-      // 如果当前 timeLeft>0，可以传 timeLeft；否则传 initialRemaining
       startTimer(timeLeft || initialRemaining)
     }
   }
 
-  // 点击暂停
+  // 暂停
   const handlePause = () => {
     pauseTimer()
     onPause?.(_id, timeLeft)
   }
 
-  // 根据按钮不同场景渲染
+  /**
+   * 渲染按钮逻辑：
+   *  - 未开始：显示 Start
+   *  - 进行中：显示 Pause
+   *  - 暂停中：如果 timeLeft > 0 且 timeLeft !== dailyDuration，则显示 Resume
+   *  - 已完成：不显示按钮
+   */
   const renderButtons = () => {
-    if (isCompleted) return null // 已完成不显示任何按钮
+    // 已完成
+    if (isCompleted) return null
 
-    // 未开始或走到 0 → Start
-    if (!isActive && timeLeft === initialRemaining) {
+    // 1) 未开始（尚未点击过 Start 或尚未扣减时间）
+    if (!isActive && timeLeft === dailyDuration) {
       return (
         <button
           className="px-3 py-1 rounded bg-blue-600 text-white"
@@ -81,7 +86,7 @@ export default function DailyTaskCard({
       )
     }
 
-    // 正在进行中 → Pause
+    // 2) 正在倒计时
     if (isActive) {
       return (
         <button
@@ -92,33 +97,49 @@ export default function DailyTaskCard({
       )
     }
 
-    // 暂停且剩余时间>0 → Resume
-    if (!isActive && timeLeft > 0) {
+    // 3) 暂停状态（timeLeft > 0），且已消耗部分时间（timeLeft !== dailyDuration）
+    if (!isActive && timeLeft > 0 && timeLeft !== dailyDuration) {
       return (
         <button
           className="px-3 py-1 rounded bg-green-500 text-white"
-          onClick={() => resumeTimer()}>
+          onClick={resumeTimer}>
           <FontAwesomeIcon icon={faPlay} /> Resume
         </button>
       )
     }
 
-    return null // 其他情况不显示
+    return null
   }
 
   return (
-    <div className={`border p-4 rounded-3xl shadow-sm ${containerColor}`}>
-      <h3 className="text-lg font-bold mb-2">{title}</h3>
+    <div
+      className={`
+        relative p-6 rounded-xl
+        shadow-xl transition-shadow duration-300 hover:shadow-2xl
+        ${containerColor}
+      `}>
+      <h3
+        className="
+          text-lg font-bold mb-2
+          bg-gradient-to-r from-purple-600 to-pink-500
+          bg-clip-text text-transparent
+        ">
+        {title}
+      </h3>
 
       <p className="text-sm">Daily Duration: {formatDuration(dailyDuration)}</p>
       <p className="text-sm">
-        Remaining:{' '}
         {isCompleted ? (
-          <span className="text-green-800 font-bold">Completed</span>
+          <div className="text-green-800 font-bold text-xl ml-4 mt-4">
+            Completed
+          </div>
         ) : (
-          <span className="text-red-600 font-bold text-xl">
-            {formatDuration(timeLeft)}
-          </span>
+          <div>
+            Remaining:{' '}
+            <span className="text-red-600 font-bold text-xl">
+              {formatDuration(timeLeft)}
+            </span>
+          </div>
         )}
       </p>
 

@@ -2,11 +2,7 @@ import { Task } from '@type/task'
 import { formatDuration } from '@/utils/formatDuration'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faPenToSquare,
-  faTrash,
-  faEdit,
-} from '@fortawesome/free-solid-svg-icons'
+import { faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 interface TaskCardProps {
   task: Task
@@ -18,26 +14,42 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete, onEdit }) => {
   const { title, totalDuration, remainingDuration, remainingDays } = task
   const isCompleted = remainingDuration === 0
 
-  // 根据是否完成改变背景
-  const backgroundColor = isCompleted ? 'bg-[#ffd6ff]' : 'bg-[#cd88e9]'
+  /**
+   * 使用一个渐变+半透明组合背景，实现更现代的「卡片」风格。
+   * 若已完成，呈现更柔和的渐变，否则使用色彩更饱满的渐变。
+   */
+  const backgroundClass = isCompleted
+    ? 'bg-gradient-to-tr from-gray-100 via-gray-200 to-gray-300'
+    : 'bg-gradient-to-tr from-purple-400 via-pink-300 to-pink-200'
 
   return (
-    <div className={`relative p-6 rounded-3xl shadow-2xl ${backgroundColor}`}>
-      {/* 右上角的图标按钮 */}
-      <div className="absolute top-4 right-5 shadow-3xl flex space-x-2">
+    <div
+      className={`
+        relative p-6 rounded-xl shadow-xl
+        transition-shadow duration-300 hover:shadow-2xl
+        ${backgroundClass}
+      `}>
+      {/* 右上角的图标按钮区 */}
+      <div className="absolute top-4 right-4 flex space-x-3">
+        {/* 只有未完成状态才显示编辑按钮 */}
         {!isCompleted && (
           <button
             onClick={onEdit}
-            className="text-blue-600 hover:text-blue-800"
+            className="
+              text-blue-700 hover:text-blue-900
+              transition-colors duration-200
+            "
             aria-label="Edit"
             title="Edit Task">
-            {/* <FaEdit className="w-5 h-5" /> */}
             <FontAwesomeIcon icon={faPenToSquare} />
           </button>
         )}
         <button
           onClick={onDelete}
-          className="text-red-600 hover:text-red-800"
+          className="
+            text-red-600 hover:text-red-800
+            transition-colors duration-200
+          "
           aria-label="Delete"
           title="Delete">
           <FontAwesomeIcon icon={faTrash} />
@@ -45,30 +57,34 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete, onEdit }) => {
       </div>
 
       {/* 任务标题 */}
-      <h3 className="text-xl font-bold mb-4 text-[#7E5CAD] truncate">
+      <h3
+        className="
+          text-xl font-bold mb-4 text-gray-700
+          truncate
+        ">
         {title}
       </h3>
 
       {/* 任务时长信息 */}
-      <div className="space-y-2">
-        <p className="text-sm text-gray-700">
-          remainingDays:{' '}
+      <div className="space-y-2 text-gray-700">
+        <p className="text-sm">
+          <span className="text-gray-600">Remaining Days:</span>{' '}
           <span className="font-semibold text-gray-900">{remainingDays}</span>
         </p>
-        <p className="text-sm text-gray-700">
-          Total Duration:{' '}
+        <p className="text-sm">
+          <span className="text-gray-600">Total Duration:</span>{' '}
           <span className="font-semibold text-gray-900">
             {formatDuration(totalDuration)}
           </span>
         </p>
-        <p className="text-sm text-gray-700">
-          Duration:{' '}
+        <p className="text-sm">
+          <span className="text-gray-600">Duration:</span>{' '}
           {isCompleted ? (
-            <span className="ml-1 font-bold text-green-600 text-lg">
+            <span className="ml-1 font-bold text-green-700 text-lg">
               Completed
             </span>
           ) : (
-            <span className="ml-1 text-3xl font-extrabold text-red-600">
+            <span className="ml-1 text-2xl font-extrabold text-red-600">
               {formatDuration(remainingDuration)}
             </span>
           )}

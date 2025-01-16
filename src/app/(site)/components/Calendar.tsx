@@ -138,7 +138,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
     }
   }
   return (
-    <div className="flex flex-col flex-1 md:flex-row bg-gray-100 p-4">
+    <div className="flex flex-col flex-1 md:flex-row bg-purple-50 p-4">
       <div className="flex flex-grow bg-white rounded-lg p-4">
         <Calendar
           localizer={localizer}
