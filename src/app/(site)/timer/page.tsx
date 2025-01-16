@@ -53,8 +53,8 @@ export default function TimerPage() {
   }
 
   return (
-    <div className="p-4 flex flex-col items-center gap-2">
-      <h1 className="text-xl font-bold">Global Timer</h1>
+    <div className="p-4 flex flex-col flex-1 items-center gap-2 bg-gray-900">
+      <h1 className="text-xl text-white font-bold">Global Timer</h1>
       <div className="flex items-center gap-2">
         <input
           type="number"
@@ -90,7 +90,7 @@ export default function TimerPage() {
           25分钟
         </button>
       </div>
-      <Card className="bg-gradient-to-tr from-[#000000] to-[#434343] flex flex-col h-48 w-96 rounded-4xl items-center justify-center">
+      <div className="bg-gradient-to-tr from-[#000000] to-[#434343] flex flex-col h-48 w-96 rounded-4xl items-center justify-center">
         <div className="text-7xl text-white  font-medium">
           {renderTimerDisplay()}
         </div>
@@ -139,7 +139,7 @@ export default function TimerPage() {
             <FontAwesomeIcon className="w-full h-full" icon={faStop} />
           </button>
         </div>
-      </Card>
+      </div>
     </div>
   )
 }
