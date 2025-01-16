@@ -130,7 +130,7 @@ export default function DailyTaskCard({
       <p className="text-sm">Daily Duration: {formatDuration(dailyDuration)}</p>
       <p className="text-sm">
         {isCompleted ? (
-          <div className="text-green-800 font-bold text-xl ml-4 mt-4">
+          <div className="text-green-800 font-bold text-2xl ml-4 mt-4">
             Completed
           </div>
         ) : (
