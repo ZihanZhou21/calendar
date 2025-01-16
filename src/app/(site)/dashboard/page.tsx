@@ -89,9 +89,9 @@ export default function DashboardPage() {
   if (error) return <div>Error loading events</div>
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-gray-100 flex flex-1 flex-col">
       <DashboardNav />
-      <div className="container pt-4">
+      <div className="container ">
         <CalendarComponent
           events={data?.data || []}
           onEdit={handleEdit}
@@ -100,7 +100,7 @@ export default function DashboardPage() {
         />
       </div>
       <Drawer open={isOpen} onClose={handleClose} position="right">
-        <Drawer.Header>{selectedEvent ? '编辑日程' : '添加日程'}</Drawer.Header>
+        <Drawer.Header>{selectedEvent ? 'Edit' : 'Add Event'}</Drawer.Header>
         <div className="p-4">
           <EventTypeForm
             key={formKey}

@@ -1,6 +1,11 @@
 // components/EventItem.tsx
 'use client'
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faPenToSquare,
+  faTrash,
+  faEdit,
+} from '@fortawesome/free-solid-svg-icons'
 import React from 'react'
 import { IEvent } from '../../models/Event'
 
@@ -27,12 +32,12 @@ const EventItem: React.FC<EventItemProps> = ({ event, onEdit, onDelete }) => {
         <button
           onClick={() => onEdit(event)}
           className="whitespace-nowrap text-blue-500 hover:underline">
-          编辑
+          <FontAwesomeIcon icon={faPenToSquare} className="bg-blue-300" />
         </button>
         <button
           onClick={() => onDelete(event._id)}
           className="whitespace-nowrap text-red-500 hover:underline">
-          删除
+          <FontAwesomeIcon icon={faTrash} />
         </button>
       </div>
     </div>

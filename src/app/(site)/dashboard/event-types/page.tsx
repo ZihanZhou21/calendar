@@ -18,8 +18,8 @@ export default function EventTypesPage() {
   const [formKey, setFormKey] = useState(0) // 用于强制重新渲染表单组件
   const { data, error } = useSWR('/api/events')
 
-  if (error) return <div>加载失败: {error.error}</div>
-  if (!data) return <div>加载中...</div>
+  if (error) return <div>Error: {error.error}</div>
+  if (!data) return <div>Loading...</div>
 
   const addEvent = async (event: EventFormData) => {
     try {
@@ -61,14 +61,14 @@ export default function EventTypesPage() {
   }
 
   const deleteEvent = async (id: string) => {
-    if (window.confirm('确定要删除这个日程吗？')) {
+    if (window.confirm('Are you sure to delete this event?')) {
       try {
         await fetch(`/api/events/${id}`, {
           method: 'DELETE',
         })
         mutate('/api/events')
       } catch (error) {
-        console.error('删除失败:', error)
+        console.error('delete error:', error)
       }
     }
   }
@@ -97,7 +97,7 @@ export default function EventTypesPage() {
         onAdd={handleAdd}
       />
       <Drawer open={isOpen} onClose={handleClose} position="right">
-        <Drawer.Header>{selectedEvent ? '编辑日程' : '添加日程'}</Drawer.Header>
+        <Drawer.Header>{selectedEvent ? 'Edit' : 'Add Event'}</Drawer.Header>
         <div className="p-4">
           <EventTypeForm
             key={formKey} // 每次重新渲染时更新 key

@@ -23,7 +23,7 @@ export default function HeaderContent({ email }: HeaderContentProps) {
         href="/"
         className="text-blue-600 font-bold text-2xl flex items-center gap-2">
         <CalendarDays size={28} />
-        Calendix
+        Calendar
       </Link>
 
       {/* Navigation links for larger screens */}

@@ -138,7 +138,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
     }
   }
   return (
-    <div className="flex flex-col md:flex-row bg-gray-100">
+    <div className="flex flex-col flex-1 md:flex-row bg-gray-100 p-4">
       <div className="flex flex-grow bg-white rounded-lg p-4">
         <Calendar
           localizer={localizer}
@@ -166,10 +166,10 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
       </div>
       <div className="flex w-[400px] flex-col mx-4 mb-4">
         <div className="bg-white rounded-lg p-4">
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">
-                {formattedSelectedDate}的日程
+                {/* {formattedSelectedDate} */}
               </h2>
               <button
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -191,9 +191,13 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
             </div>
 
             {!selectedDate ? (
-              <p className="text-gray-500 text-center py-4">点击日历选择日期</p>
+              <p className="text-gray-500 text-center py-4">
+                click to select schedule
+              </p>
             ) : filteredEvents.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">当天没有安排日程</p>
+              <p className="text-gray-500 text-center py-4">
+                There is no schedule today
+              </p>
             ) : (
               <ul className="space-y-2">
                 {filteredEvents.map((event) => (

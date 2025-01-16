@@ -25,7 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={noto.className}>
         <SWRProvider>
-          <main className="container flex flex-col min-h-screen">
+          <main className="container flex flex-col max-h-screen min-h-screen">
             <Header />
             <TimerProvider>{children}</TimerProvider>
           </main>
