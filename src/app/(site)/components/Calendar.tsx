@@ -138,8 +138,8 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
     }
   }
   return (
-    <div className="flex flex-col flex-1 md:flex-row bg-purple-50 p-4">
-      <div className="flex flex-grow bg-white rounded-lg p-4">
+    <div className="flex flex-col flex-1 md:flex-row bg-purple-50 px-4 pb-4 gap-4">
+      <div className="flex flex-grow bg-white rounded-lg flex-1 p-4">
         <Calendar
           localizer={localizer}
           events={formattedEvents as any[]}
@@ -157,14 +157,14 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
           eventPropGetter={eventPropGetter}
           className="rounded-lg [&_.rbc-event]:min-h-[20px] [&_.rbc-event-content]:text-xs [&_.rbc-event-content]:leading-4 [&_.rbc-show-more]:text-xs [&_.rbc-show-more]:text-blue-500 [&_.rbc-show-more]:bg-transparent [&_.rbc-show-more]:p-0.5 [&_.rbc-event]:my-0.5 [&_.rbc-event-label]:text-[0.7rem] [&_.rbc-event-label]:px-0.5 [&_.rbc-allday-cell]:max-h-[45px]"
           style={{
-            height: '80vh',
+            height: '100%',
             width: '100%',
           }}
           length={length}
           date={currentDate}
         />
       </div>
-      <div className="flex w-[400px] flex-col mx-4 mb-4">
+      <div className="flex w-[400px] flex-col ">
         <div className="bg-white rounded-lg p-4">
           <div className="flex flex-col">
             <div className="flex justify-between items-center">

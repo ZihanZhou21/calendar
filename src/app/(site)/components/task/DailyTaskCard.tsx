@@ -128,7 +128,7 @@ export default function DailyTaskCard({
       </h3>
 
       <p className="text-sm">Daily Duration: {formatDuration(dailyDuration)}</p>
-      <p className="text-sm">
+      <div className="text-sm">
         {isCompleted ? (
           <div className="text-green-800 font-bold text-2xl ml-4 mt-4">
             Completed
@@ -141,7 +141,7 @@ export default function DailyTaskCard({
             </span>
           </div>
         )}
-      </p>
+      </div>
 
       <div className="flex gap-2 mt-2">{renderButtons()}</div>
     </div>

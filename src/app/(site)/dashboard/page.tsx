@@ -91,14 +91,14 @@ export default function DashboardPage() {
   return (
     <div className="bg-gray-100 flex flex-1 flex-col">
       <DashboardNav />
-      <div className="container ">
-        <CalendarComponent
-          events={data?.data || []}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onAdd={handleAdd}
-        />
-      </div>
+      {/* <div className="container "> */}
+      <CalendarComponent
+        events={data?.data || []}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onAdd={handleAdd}
+      />
+      {/* </div> */}
       <Drawer open={isOpen} onClose={handleClose} position="right">
         <Drawer.Header>{selectedEvent ? 'Edit' : 'Add Event'}</Drawer.Header>
         <div className="p-4">

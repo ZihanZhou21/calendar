@@ -35,7 +35,7 @@ export default function TimerPage() {
   }
 
   return (
-    <div className="p-4 flex flex-col flex-1 items-center gap-4 bg-gray-900 min-h-screen">
+    <div className="p-4 flex flex-col flex-1 items-center gap-4 bg-gray-900 ">
       {/* 标题 */}
       <h1 className="text-2xl text-white font-bold">Timer</h1>
 
