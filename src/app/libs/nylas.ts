@@ -7,7 +7,7 @@ if (!process.env.NYLAS_API_KEY) {
 export const nylasConfig = {
   clientId: process.env.NYLAS_CLIENT_ID,
   // callbackUri: 'https://calendar-zh.vercel.app/api/oauth/exchange',
-  redirectUri:
+  callbackUri:
     process.env.NODE_ENV === 'production'
       ? 'https://calendar-zh.vercel.app/api/oauth/exchange'
       : 'http://localhost:3000/api/oauth/exchange',
