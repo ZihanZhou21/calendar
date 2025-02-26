@@ -27,7 +27,11 @@ export async function GET(req: NextRequest) {
     })
   }
 
-  if (!nylasConfig.apiKey || !nylasConfig.clientId) {
+  if (
+    !nylasConfig.apiKey ||
+    !nylasConfig.clientId ||
+    !nylasConfig.callbackUri
+  ) {
     return Response.json('Nylas configuration is missing', {
       status: 500,
     })
