@@ -15,7 +15,7 @@ const SWRProvider: React.FC<SWRProviderProps> = ({ children }) => {
       value={{
         fetcher,
         onError: (error: any) => {
-          console.error(error)
+          console.log(error)
         },
       }}>
       {children}
