@@ -334,130 +334,134 @@ export default function TaskManagementPage() {
   }
 
   return (
-    <div className=" p-6 flex-col flex-1 bg-purple-50 ">
-      <h1 className="text-3xl font-bold mb-4">Task</h1>
+    <div className=" bg-gradient-to-br from-purple-100 via-blue-50 to-pink-100 flex flex-col items-center py-10 overflow-y-auto max-h-screen">
+      <div className="w-full max-w-5xl bg-white/80 rounded-3xl shadow-2xl p-8 overflow-y-auto max-h-screen">
+        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-8 text-center drop-shadow-lg">
+          Task Manage
+        </h1>
 
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      <div className="flex justify-between items-center w-full">
-        {' '}
-        <button
-          onClick={() => setShowForm(true)}
-          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded-2xl hover:bg-blue-600">
-          create task
-        </button>
-        {/* 更新每日任务按钮 */}
-        <button
-          onClick={handleResetDailyTasks}
-          disabled={isLoading}
-          className={`mb-6 px-4 py-2 rounded-xl ${
-            isLoading
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-green-600 hover:bg-green-700 text-white'
-          }`}>
-          {isLoading ? (
-            'refreshing...'
+        {error && (
+          <p className="text-red-500 mb-4 text-center font-semibold">{error}</p>
+        )}
+        <div className="flex justify-between items-center mb-8">
+          <button
+            onClick={() => setShowForm(true)}
+            className="px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold shadow-lg hover:scale-105 transition-all duration-200">
+            New Task
+          </button>
+          <button
+            onClick={handleResetDailyTasks}
+            disabled={isLoading}
+            className={`px-6 py-2 rounded-full font-semibold shadow-lg transition-all duration-200 ${
+              isLoading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-gradient-to-r from-green-400 to-green-600 text-white hover:scale-105'
+            }`}>
+            {isLoading ? (
+              'refreshing...'
+            ) : (
+              <FontAwesomeIcon icon={faArrowsRotate} />
+            )}
+          </button>
+        </div>
+
+        {/* 任务表单 */}
+        {showForm && (
+          <TaskForm
+            onCreateTask={
+              editingTask
+                ? (title, totalDuration, totalDays) =>
+                    editTask(editingTask._id, title, totalDuration, totalDays)
+                : createTask
+            }
+            onCancel={() => {
+              setEditingTask(null)
+              setShowForm(false)
+            }}
+            initialValues={editingTask || undefined}
+          />
+        )}
+
+        {/* 任务列表 */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4 text-purple-700">
+            task list
+          </h2>
+          {tasks.length === 0 ? (
+            <p className="text-gray-400 text-center">no task</p>
           ) : (
-            <FontAwesomeIcon icon={faArrowsRotate} />
+            <div className="grid gap-6 grid-cols-[repeat(auto-fill,_minmax(8rem,_1fr))]">
+              {tasks.map((task) => (
+                <TaskCard
+                  key={task._id}
+                  task={task}
+                  onDelete={() => deleteTask(task._id)}
+                  onEdit={() => {
+                    setEditingTask(task)
+                    setShowForm(true)
+                  }}
+                />
+              ))}
+            </div>
           )}
-        </button>
-      </div>
-      {/* 创建任务按钮 */}
+        </div>
 
-      {/* 任务表单 */}
-      {showForm && (
-        <TaskForm
-          onCreateTask={
-            editingTask
-              ? (title, totalDuration, totalDays) =>
-                  editTask(editingTask._id, title, totalDuration, totalDays)
-              : createTask
-          }
-          onCancel={() => {
-            setEditingTask(null)
-            setShowForm(false)
-          }}
-          initialValues={editingTask || undefined}
-        />
-      )}
-
-      {/* 任务列表 */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-2">task list</h2>
-        {tasks.length === 0 ? (
-          <p>No Task</p>
-        ) : (
-          <div className="grid gap-4 grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))]">
-            {/* // <div className="flex gap-4 flex-wrap"> */}
-            {tasks.map((task) => (
-              <TaskCard
-                key={task._id}
-                task={task}
-                onDelete={() => deleteTask(task._id)}
-                onEdit={() => {
-                  setEditingTask(task)
-                  setShowForm(true)
-                }}
-                // Add this to allow content to determine height
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 每日任务列表 */}
-      <div>
-        <h2 className="text-2xl font-semibold mb-2">Daily Task</h2>
-        {dailyTasks.length === 0 ? (
-          <p>No Daily Task</p>
-        ) : (
-          // <div className="flex gap-4 flex-wrap">
-          <div className="grid gap-4 grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))]">
-            {dailyTasks.map((dailyTask) => (
-              <DailyTaskCard
-                key={dailyTask._id}
-                task={dailyTask}
-                onComplete={async (dailyTaskId, remainingDuration) => {
-                  try {
-                    if (dailyTask.isCompleted) {
-                      return
+        {/* 每日任务列表 */}
+        <div>
+          <h2 className="text-2xl font-semibold mb-4 text-pink-700">
+            Daily task
+          </h2>
+          {dailyTasks.length === 0 ? (
+            <p className="text-gray-400 text-center">no dailytask</p>
+          ) : (
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {dailyTasks.map((dailyTask) => (
+                <DailyTaskCard
+                  key={dailyTask._id}
+                  task={dailyTask}
+                  onComplete={async (dailyTaskId, remainingDuration) => {
+                    try {
+                      if (dailyTask.isCompleted) {
+                        return
+                      }
+                      setIsLoading(true)
+                      await completeDailyTask(
+                        dailyTaskId,
+                        remainingDuration,
+                        dailyTask.dailyDuration,
+                        dailyTask.taskId
+                      )
+                    } catch (error) {
+                      console.error('Failed to complete daily task:', error)
+                      setError('完成每日任务失败，请稍后重试。')
+                    } finally {
+                      setIsLoading(false)
                     }
-                    setIsLoading(true)
-                    await completeDailyTask(
-                      dailyTaskId,
-                      remainingDuration,
-                      dailyTask.dailyDuration,
-                      dailyTask.taskId
-                    )
-                  } catch (error) {
-                    console.error('Failed to complete daily task:', error)
-                    setError('完成每日任务失败，请稍后重试。')
-                  } finally {
-                    setIsLoading(false)
-                  }
-                }}
-                onPause={async (dailyTaskId, remainingDuration) => {
-                  try {
-                    if (dailyTask.isCompleted) {
-                      return
+                  }}
+                  onPause={async (dailyTaskId, remainingDuration) => {
+                    try {
+                      if (dailyTask.isCompleted) {
+                        return
+                      }
+                      setIsLoading(true)
+                      await pauseDailyTask(
+                        dailyTaskId,
+                        remainingDuration,
+                        dailyTask.dailyDuration,
+                        dailyTask.taskId
+                      )
+                    } catch (error) {
+                      console.error('Failed to pause daily task:', error)
+                      setError('暂停每日任务失败，请稍后重试。')
+                    } finally {
+                      setIsLoading(false)
                     }
-                    setIsLoading(true)
-                    await pauseDailyTask(
-                      dailyTaskId,
-                      remainingDuration,
-                      dailyTask.dailyDuration,
-                      dailyTask.taskId
-                    )
-                  } catch (error) {
-                    console.error('Failed to pause daily task:', error)
-                    setError('暂停每日任务失败，请稍后重试。')
-                  } finally {
-                    setIsLoading(false)
-                  }
-                }}
-              />
-            ))}
-          </div>
-        )}
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
